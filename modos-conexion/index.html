@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" id="html-root">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -399,9 +399,43 @@
     .props-grid { grid-template-columns: 1fr; }
     .footer { padding: 20px 24px; }
   }
+
+  /* ── Language Switcher ── */
+  #lang-switcher {
+    position: fixed;
+    top: 18px;
+    right: 22px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 5px 10px 5px 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    user-select: none;
+    transition: box-shadow 0.2s;
+  }
+  #lang-switcher:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.15); }
+  #lang-switcher .flag { font-size: 18px; line-height: 1; }
+  #lang-switcher .lang-label { font-size: 12px; letter-spacing: 0.06em; }
+  [data-lang] { transition: opacity 0.15s; }
+
 </style>
 </head>
 <body>
+
+
+<div id="lang-switcher" onclick="toggleLang()" title="Switch language">
+  <span class="flag" id="lang-flag">🇺🇸</span>
+  <span class="lang-label" id="lang-label">EN</span>
+</div>
 
 <div class="cover">
   <p class="cover-eyebrow">Rosetta Labs · EAB-64 Protocol</p>
@@ -1776,8 +1810,8 @@
 
     <div style="background:var(--ink); border-radius:12px; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
       <div>
-        <p style="font-size:16px; font-weight:600; color:#fff; margin-bottom:6px;">Contacta al equipo de arquitectura EAB-64</p>
-        <p style="font-size:14px; color:#a0aec0;">Respuesta en menos de 24 horas hábiles · Reunión sin compromiso</p>
+        <p id="cta-contact-h" style="font-size:16px; font-weight:600; color:#fff; margin-bottom:6px;">Contacta al equipo de arquitectura EAB-64</p>
+        <p id="cta-contact-sub" style="font-size:14px; color:#a0aec0;">Respuesta en menos de 24 horas hábiles · Reunión sin compromiso</p>
       </div>
       <a href="mailto:eab@globalflow.tech" style="background:var(--accent); color:#fff; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; white-space:nowrap;">eab@globalflow.tech</a>
     </div>
@@ -1788,7 +1822,7 @@
 
 <div class="footer">
   <div><strong>Rosetta Labs</strong> · EAB-64 Protocol Documentation</div>
-  <div>Confidencial · v4.0 · Julio 2026 · GRC · Shadow Mode · Ley 19.799 · CTA</div>
+  <div id="footer-conf">Confidencial · v4.0 · Julio 2026 · GRC · Shadow Mode · Ley 19.799 · CTA</div>
 </div>
 
 <script>
@@ -1820,5 +1854,138 @@ function resetQuiz() {
   document.getElementById('q1').style.display = 'block';
 }
 </script>
+
+<script>
+// ── EAB-64 i18n — ES ↔ EN ──
+const STRINGS = {
+  es: {
+    // Cover
+    'cover-eyebrow': 'Documentación Técnica — Rosetta Labs',
+    'cover-title-html': 'EAB-64 <span>Modos de Conexión</span>',
+    'cover-sub': 'Guía de referencia para arquitectos de seguridad y equipos de operaciones. Selección, comparación e implementación de los seis modos de despliegue del protocolo de gobernanza criptográfica.',
+    'meta-version': 'v4.0',
+    'meta-version-label': 'Versión',
+    'meta-date': 'Julio 2026',
+    'meta-date-label': 'Actualización',
+    'meta-modes': '6 modos',
+    'meta-modes-label': 'Modos de despliegue',
+    'meta-cases': '5 preguntas',
+    'meta-cases-label': 'Matriz de decisión',
+    // TOC label
+    'toc-label': 'Contenido',
+    // Footer
+    'footer-conf': 'Confidencial · v4.0 · Julio 2026 · GRC · Shadow Mode · Ley 19.799 · CTA',
+    // CTA
+    'cta-title': 'Próximos pasos',
+    'cta-sub': '¿Listo para evaluar qué modo de despliegue es el correcto para tu organización?',
+    'cta-contact': 'Contacta al equipo de arquitectura EAB-64',
+    'cta-contact-sub': 'Respuesta en menos de 24 horas hábiles · Reunión sin compromiso',
+    // Disclaimer
+    'disc-title': 'Aviso de Gobernanza, Riesgo y Cumplimiento (GRC)',
+    'disc-sub': 'Límites de responsabilidad legal · Ley 21.719 · NCG 502/524 CMF',
+    // Shadow Mode
+    'shadow-title': 'Onboarding en Shadow Mode — para entornos de misión crítica',
+    'shadow-sub': 'Política de observabilidad no-intrusiva para CISOs y equipos de operaciones bancarias. Aplica a los Casos 2, 3 y 5.',
+    // Legal
+    'legal-title': 'Explicabilidad legal y No Repudio — Ley 19.799',
+    'legal-sub': 'Arquitectura de sellado criptográfico · Firma Electrónica Avanzada · Árbol de Merkle · Módulo HSM',
+  },
+  en: {
+    // Cover
+    'cover-eyebrow': 'Technical Documentation — Rosetta Labs',
+    'cover-title-html': 'EAB-64 <span>Connection Modes</span>',
+    'cover-sub': 'Reference guide for security architects and operations teams. Selection, comparison and implementation of the six deployment modes of the cryptographic governance protocol.',
+    'meta-version': 'v4.0',
+    'meta-version-label': 'Version',
+    'meta-date': 'July 2026',
+    'meta-date-label': 'Updated',
+    'meta-modes': '6 modes',
+    'meta-modes-label': 'Deployment modes',
+    'meta-cases': '5 questions',
+    'meta-cases-label': 'Decision matrix',
+    // TOC label
+    'toc-label': 'Contents',
+    // Footer
+    'footer-conf': 'Confidential · v4.0 · July 2026 · GRC · Shadow Mode · Law 19.799 · CTA',
+    // CTA
+    'cta-title': 'Next steps',
+    'cta-sub': 'Ready to evaluate which deployment mode is right for your organization?',
+    'cta-contact': 'Contact the EAB-64 architecture team',
+    'cta-contact-sub': 'Response within 24 business hours · No-commitment meeting',
+    // Disclaimer
+    'disc-title': 'Governance, Risk & Compliance (GRC) Notice',
+    'disc-sub': 'Legal liability limits · Law 21.719 · CMF Regulations NCG 502/524',
+    // Shadow Mode
+    'shadow-title': 'Shadow Mode Onboarding — for mission-critical environments',
+    'shadow-sub': 'Non-intrusive observability policy for CISOs and banking operations teams. Applies to Cases 2, 3 and 5.',
+    // Legal
+    'legal-title': 'Legal Explainability and Non-Repudiation — Law 19.799',
+    'legal-sub': 'Cryptographic sealing architecture · Advanced Electronic Signature · Merkle Tree · HSM Module',
+  }
+};
+
+// Nodos i18n mapeados a IDs
+const NODE_MAP = {
+  'cover-eyebrow':     { sel: '.cover-eyebrow',   prop: 'innerHTML' },
+  'cover-title-html':  { sel: '.cover-title',      prop: 'innerHTML' },
+  'cover-sub':         { sel: '.cover-sub',        prop: 'innerHTML' },
+  'toc-label':         { sel: '.toc-label',        prop: 'innerHTML' },
+  'cta-title':         { sel: '#cta h2',           prop: 'innerHTML' },
+  'cta-sub':           { sel: '#cta .case-header-text p', prop: 'innerHTML' },
+  'cta-contact':       { sel: '#cta-contact-h',    prop: 'innerHTML' },
+  'cta-contact-sub':   { sel: '#cta-contact-sub',  prop: 'innerHTML' },
+  'disc-title':        { sel: '#disclaimer h2',    prop: 'innerHTML' },
+  'disc-sub':          { sel: '#disclaimer .case-header-text p', prop: 'innerHTML' },
+  'shadow-title':      { sel: '#shadowmode h2',    prop: 'innerHTML' },
+  'shadow-sub':        { sel: '#shadowmode .case-header-text p', prop: 'innerHTML' },
+  'legal-title':       { sel: '#legal h2',         prop: 'innerHTML' },
+  'legal-sub':         { sel: '#legal .case-header-text p', prop: 'innerHTML' },
+  'footer-conf':       { sel: '#footer-conf',      prop: 'innerHTML' },
+};
+
+// Meta items necesitan targeting especial
+const META_MAP = [
+  { key: 'meta-version',       labelKey: 'meta-version-label',       idx: 0 },
+  { key: 'meta-date',          labelKey: 'meta-date-label',          idx: 1 },
+  { key: 'meta-modes',         labelKey: 'meta-modes-label',         idx: 2 },
+  { key: 'meta-cases',         labelKey: 'meta-cases-label',         idx: 3 },
+];
+
+let currentLang = 'es';
+
+function applyLang(lang) {
+  const s = STRINGS[lang];
+  document.getElementById('html-root').lang = lang;
+  document.title = lang === 'es'
+    ? 'EAB-64 — Modos de Conexión'
+    : 'EAB-64 — Connection Modes';
+
+  // Nodos genéricos
+  for (const [key, cfg] of Object.entries(NODE_MAP)) {
+    if (!s[key]) continue;
+    const el = document.querySelector(cfg.sel);
+    if (el) el[cfg.prop] = s[key];
+  }
+
+  // Meta items
+  const metaItems = document.querySelectorAll('.cover-meta-item');
+  META_MAP.forEach(({ key, labelKey, idx }) => {
+    if (metaItems[idx]) {
+      metaItems[idx].innerHTML =
+        '<strong>' + s[key] + '</strong>' + s[labelKey];
+    }
+  });
+
+  // Switcher badge
+  document.getElementById('lang-flag').textContent  = lang === 'es' ? '🇺🇸' : '🇪🇸';
+  document.getElementById('lang-label').textContent = lang === 'es' ? 'EN' : 'ES';
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'es' ? 'en' : 'es';
+  applyLang(currentLang);
+}
+</script>
+
 </body>
 </html>
