@@ -402,10 +402,11 @@
 
   /* ── Language Switcher ── */
   #lang-switcher {
-    position: fixed;
-    top: 18px;
-    right: 22px;
-    z-index: 9999;
+    position: fixed !important;
+    top: 18px !important;
+    right: 22px !important;
+    z-index: 999999 !important;
+
     display: flex;
     align-items: center;
     gap: 6px;
@@ -432,11 +433,11 @@
 <body>
 
 
+
 <div id="lang-switcher" onclick="toggleLang()" title="Switch language">
   <span class="flag" id="lang-flag">🇺🇸</span>
   <span class="lang-label" id="lang-label">EN</span>
 </div>
-
 <div class="cover">
   <p class="cover-eyebrow">Rosetta Labs · EAB-64 Protocol</p>
   <h1 class="cover-title">Modos de conexión<br><span>EAB-64 Enforcement Proxy</span></h1>
