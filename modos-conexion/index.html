@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EAB-64 — Modos de Conexión</title>
+<style>
+  :root {
+    --ink: #0f1117;
+    --ink-mid: #3a3d4a;
+    --ink-soft: #6b6f7e;
+    --surface: #f7f8fc;
+    --card: #ffffff;
+    --accent: #2d4fff;
+    --accent-soft: #e8ecff;
+    --purple: #5b2be0;
+    --purple-soft: #ede8fb;
+    --teal: #0e8a73;
+    --teal-soft: #e0f5f0;
+    --amber: #c47a00;
+    --amber-soft: #fff3d6;
+    --coral: #c93940;
+    --coral-soft: #fce8e9;
+    --green: #1a7a3c;
+    --green-soft: #e6f5ec;
+    --border: #e2e5f0;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  .cover {
+    background: var(--ink);
+    color: #fff;
+    padding: 64px 48px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.08;
+  }
+  .cover-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8899cc;
+    margin-bottom: 18px;
+  }
+  .cover-title {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    max-width: 560px;
+  }
+  .cover-title span { color: #7ba3ff; }
+  .cover-sub {
+    font-size: 16px;
+    color: #a0aec0;
+    max-width: 520px;
+    margin-bottom: 36px;
+  }
+  .cover-meta {
+    display: flex; gap: 32px; flex-wrap: wrap;
+  }
+  .cover-meta-item { font-size: 13px; color: #718096; }
+  .cover-meta-item strong { color: #e2e8f0; display: block; font-size: 14px; }
+
+  .toc {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 48px;
+  }
+  .toc-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 14px; }
+  .toc-list { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toc-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    text-decoration: none;
+  }
+  .toc-item:hover { border-color: var(--accent); color: var(--accent); }
+
+  .main { max-width: 900px; margin: 0 auto; padding: 48px 32px 80px; }
+
+  .case-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 48px;
+    overflow: hidden;
+  }
+  .case-header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .case-number {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .case-number.c1 { background: var(--accent-soft); color: var(--accent); }
+  .case-number.c2 { background: var(--purple-soft); color: var(--purple); }
+  .case-number.c3 { background: var(--teal-soft); color: var(--teal); }
+
+  .case-header-text h2 { font-size: 19px; font-weight: 600; margin-bottom: 4px; }
+  .case-header-text p { font-size: 14px; color: var(--ink-soft); }
+
+  .case-body { padding: 28px 32px; }
+
+  .diagram-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 16px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+
+  .flow-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 10px;
+    flex-wrap: nowrap;
+    min-width: 600px;
+  }
+  .flow-node {
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    min-width: 110px;
+    line-height: 1.3;
+  }
+  .flow-node .sub { font-size: 11px; font-weight: 400; opacity: 0.75; margin-top: 2px; }
+  .flow-arrow {
+    flex-shrink: 0;
+    width: 32px;
+    text-align: center;
+    font-size: 16px;
+    color: var(--ink-soft);
+    position: relative;
+  }
+  .flow-arrow.rev { transform: scaleX(-1); }
+  .arrow-label {
+    font-size: 10px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    letter-spacing: 0.04em;
+  }
+
+  .n-gray { background: #f1f3f8; color: #3a3d4a; border: 1px solid #dde0ec; }
+  .n-blue { background: var(--accent-soft); color: var(--accent); border: 1px solid #c5cfff; }
+  .n-purple { background: var(--purple-soft); color: var(--purple); border: 1px solid #c9b8f5; }
+  .n-teal { background: var(--teal-soft); color: var(--teal); border: 1px solid #a6dfd5; }
+  .n-coral { background: var(--coral-soft); color: var(--coral); border: 1px solid #f5bbbf; }
+  .n-amber { background: var(--amber-soft); color: var(--amber); border: 1px solid #f0d48a; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .props-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .prop-box {
+    border-radius: 8px;
+    padding: 16px 18px;
+    border: 1px solid;
+  }
+  .prop-box.pro { background: var(--green-soft); border-color: #a8dbc0; }
+  .prop-box.con { background: var(--coral-soft); border-color: #f5bbbf; }
+  .prop-box h4 { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .prop-box.pro h4 { color: var(--green); }
+  .prop-box.con h4 { color: var(--coral); }
+  .prop-box ul { padding-left: 16px; }
+  .prop-box li { font-size: 13px; margin-bottom: 6px; color: var(--ink-mid); }
+
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    border: 1px solid;
+  }
+  .tag.blue { background: var(--accent-soft); color: var(--accent); border-color: #c5cfff; }
+  .tag.purple { background: var(--purple-soft); color: var(--purple); border-color: #c9b8f5; }
+  .tag.teal { background: var(--teal-soft); color: var(--teal); border-color: #a6dfd5; }
+  .tag.amber { background: var(--amber-soft); color: var(--amber); border-color: #f0d48a; }
+  .tag.coral { background: var(--coral-soft); color: var(--coral); border-color: #f5bbbf; }
+
+  .desc-block { margin-bottom: 18px; }
+  .desc-block h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
+  .desc-block p, .desc-block li { font-size: 14px; color: var(--ink-mid); margin-bottom: 4px; }
+  .desc-block ul { padding-left: 18px; }
+
+  .highlight-box {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ink-mid);
+    margin: 16px 0;
+  }
+
+  .tls-decision {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 16px 0;
+  }
+  .tls-decision h4 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+  .decision-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .decision-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .db-a { background: var(--accent-soft); color: var(--accent); }
+  .db-b { background: var(--purple-soft); color: var(--purple); }
+  .db-c { background: #f1f3f8; color: var(--ink-soft); }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 24px;
+  }
+  .compare-table th {
+    background: var(--surface);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+  .compare-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--ink-mid);
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: var(--surface); }
+  .compare-table td:first-child { font-weight: 500; color: var(--ink); white-space: nowrap; }
+
+  .footer {
+    background: var(--ink);
+    color: #718096;
+    padding: 28px 48px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer strong { color: #e2e8f0; }
+
+  .quiz-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  .quiz-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .profile-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .profile-item .pi-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .profile-item .pi-value {
+    font-size: 13px;
+    color: var(--ink-mid);
+    font-weight: 500;
+  }
+  .req-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .req-table th {
+    background: var(--surface);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .req-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-mid);
+    vertical-align: top;
+  }
+  .req-table tr:last-child td { border-bottom: none; }
+  .req-table td:first-child { font-weight: 500; color: var(--ink); white-space: nowrap; }
+  .impl-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .impl-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    text-align: center;
+    flex: 1;
+    min-width: 130px;
+  }
+  .impl-chip .ic-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 4px; }
+  .impl-chip .ic-value { font-weight: 600; color: var(--ink); }
+  @media (max-width: 640px) {
+    .cover { padding: 40px 24px; }
+    .toc { padding: 20px 24px; }
+    .main { padding: 32px 16px 60px; }
+    .case-body { padding: 20px 18px; }
+    .case-header { padding: 20px 18px 16px; }
+    .props-grid { grid-template-columns: 1fr; }
+    .footer { padding: 20px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <p class="cover-eyebrow">Rosetta Labs · EAB-64 Protocol</p>
+  <h1 class="cover-title">Modos de conexión<br><span>EAB-64 Enforcement Proxy</span></h1>
+  <p class="cover-sub">Guía técnica de las seis topologías de despliegue disponibles para la integración del proxy de gobernanza EAB-64 en infraestructuras de clientes regulados.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><strong>Audiencia</strong>Equipos de infraestructura y seguridad</div>
+    <div class="cover-meta-item"><strong>Versión</strong>1.0 — Julio 2026</div>
+    <div class="cover-meta-item"><strong>Clasificación</strong>Confidencial — uso interno</div>
+  </div>
+</div>
+
+<div class="toc">
+  <p class="toc-label">Contenido</p>
+  <div class="toc-list">
+    <a href="#decision" class="toc-item">¿Qué modo usar?</a>
+    <a href="#combinaciones" class="toc-item">Combinaciones y migración</a>
+    <a href="#caso1" class="toc-item">Caso 1 — Bridge transparente L2</a>
+    <a href="#caso2" class="toc-item">Caso 2 — Gateway de egress en DMZ</a>
+    <a href="#caso3" class="toc-item">Caso 3 — Proxy selectivo con behavioral scoring</a>
+    <a href="#caso4" class="toc-item">Caso 4 — Integración ICAP</a>
+    <a href="#caso5" class="toc-item">Caso 5 — Sidecar Envoy en Kubernetes</a>
+    <a href="#caso6" class="toc-item">Caso 6 — Reverse Proxy Gateway</a>
+    <a href="#comparativa" class="toc-item">Tabla comparativa — 6 modos</a>
+    <a href="#disclaimer" class="toc-item">Aviso GRC — Responsabilidad legal</a>
+    <a href="#shadowmode" class="toc-item">Shadow Mode — Onboarding</a>
+    <a href="#legal" class="toc-item">No Repudio — Ley 19.799</a>
+    <a href="#cta" class="toc-item">Próximos pasos</a>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ─── FLOWCHART DE DECISIÓN ─────────────────────────── -->
+<div class="case-block" id="decision" style="margin-bottom:48px;">
+  <div class="case-header">
+    <div class="case-number c1" style="background:var(--accent-soft);color:var(--accent); font-size:20px;">?</div>
+    <div class="case-header-text">
+      <h2>¿Qué modo es el correcto para tu organización?</h2>
+      <p>Responde las siguientes preguntas para identificar el modo de despliegue recomendado. Puedes seleccionar más de uno si tu entorno es híbrido.</p>
+    </div>
+  </div>
+  <div class="case-body">
+    <div id="quiz" style="font-size:14px; color:var(--ink-mid);">
+      <div id="q1" class="quiz-step">
+        <p style="font-weight:600; color:var(--ink); margin-bottom:12px;">1. ¿Tienes agentes desplegados en Kubernetes en producción?</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="quiz-btn" onclick="showResult('caso5', '✅ Caso 5 — Sidecar Envoy en Kubernetes', 'Tus agentes en K8s se benefician de enforcement nativo por Pod, Policy as Code y streaming sin restricciones.')">Sí, tenemos K8s</button>
+          <button class="quiz-btn" onclick="showQ(2)">No / parcialmente</button>
+        </div>
+      </div>
+      <div id="q2" class="quiz-step" style="display:none; margin-top:16px;">
+        <p style="font-weight:600; color:var(--ink); margin-bottom:12px;">2. ¿Tu firewall es un NGFW enterprise (Palo Alto, Fortinet, CheckPoint) con SSL inspection habilitado?</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="quiz-btn" onclick="showResult('caso4', '✅ Caso 4 — Integración ICAP (Sub-variante A)', 'Aprovechas la inversión ya hecha en el NGFW. Recuerda: solo Sub-variante A. Sin streaming nativo.')">Sí, NGFW con SSL inspection</button>
+          <button class="quiz-btn" onclick="showQ(3)">No o sin SSL inspection</button>
+        </div>
+      </div>
+      <div id="q3" class="quiz-step" style="display:none; margin-top:16px;">
+        <p style="font-weight:600; color:var(--ink); margin-bottom:12px;">3. ¿Tienes agentes legacy (aplicaciones monolíticas, scripts) que no puedes refactorizar?</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="quiz-btn" onclick="showResult('caso6', '✅ Caso 6 — Reverse Proxy Gateway', 'El cambio mínimo es solo la URL base del agente. Control total de timeouts y streaming nativo.')">Sí, tenemos legacy</button>
+          <button class="quiz-btn" onclick="showQ(4)">No, podemos modificar los agentes</button>
+        </div>
+      </div>
+      <div id="q4" class="quiz-step" style="display:none; margin-top:16px;">
+        <p style="font-weight:600; color:var(--ink); margin-bottom:12px;">4. ¿Necesitas un PoC rápido sin modificar infraestructura de red?</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="quiz-btn" onclick="showResult('caso1', '✅ Caso 1 — Bridge transparente L2', 'Solo cableado físico. Sin tocar rutas, DNS ni reglas del firewall. Ideal para validar EAB-64 en 1–2 semanas.')">Sí, quiero un PoC rápido</button>
+          <button class="quiz-btn" onclick="showQ(5)">No, vamos directo a producción</button>
+        </div>
+      </div>
+      <div id="q5" class="quiz-step" style="display:none; margin-top:16px;">
+        <p style="font-weight:600; color:var(--ink); margin-bottom:12px;">5. ¿Tu prioridad es defense-in-depth y alta visibilidad de shadow AI?</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="quiz-btn" onclick="showResult('caso2', '✅ Caso 2 — Gateway de egress en DMZ', 'La topología más defendible para producción regulada. Recomendación estándar Rosetta Labs.')">Defense-in-depth / producción regulada</button>
+          <button class="quiz-btn" onclick="showResult('caso3', '✅ Caso 3 — Proxy selectivo con Behavioral Scoring', 'Máxima visibilidad de shadow AI con mínimo overhead TLS. Ideal para entornos LATAM financiero con alta adopción de IA no controlada.')">Discovery de shadow AI / behavioral scoring</button>
+        </div>
+      </div>
+      <div id="result-box" style="display:none; margin-top:20px; padding:18px 20px; border-radius:10px; background:var(--accent-soft); border:1px solid #c5cfff;">
+        <p id="result-title" style="font-size:16px; font-weight:600; color:var(--accent); margin-bottom:6px;"></p>
+        <p id="result-desc" style="font-size:13px; color:var(--ink-mid); margin-bottom:14px;"></p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="quiz-btn" id="result-link" onclick="">Ver detalle del caso</button>
+          <button class="quiz-btn" style="background:var(--surface); color:var(--ink-mid); border-color:var(--border);" onclick="resetQuiz()">Reiniciar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── COMBINACIONES RECOMENDADAS ────────────────────── -->
+<div class="case-block" id="combinaciones" style="margin-bottom:48px;">
+  <div class="case-header">
+    <div class="case-number c1" style="background:var(--purple-soft);color:var(--purple); font-size:18px;">⇌</div>
+    <div class="case-header-text">
+      <h2>Combinaciones recomendadas en producción</h2>
+      <p>En entornos reales, los clientes combinan modos según el perfil de cada agente y la madurez de su infraestructura. Estas son las combinaciones más frecuentes.</p>
+    </div>
+  </div>
+  <div class="case-body">
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+
+      <div style="border:1px solid var(--border); border-radius:10px; padding:18px; background:var(--card);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <span style="background:var(--accent-soft); color:var(--accent); font-size:11px; font-weight:700; padding:3px 10px; border-radius:4px; border:1px solid #c5cfff;">COMBINACIÓN A</span>
+          <span style="font-size:13px; font-weight:600; color:var(--ink);">Migración progresiva</span>
+        </div>
+        <p style="font-size:12px; color:var(--ink-soft); margin-bottom:10px;">Para empresas grandes con entornos heterogéneos.</p>
+        <div style="font-size:13px; color:var(--ink-mid);">
+          <div style="margin-bottom:6px;">① <strong>Caso 1</strong> — PoC y onboarding (1-2 sem.)</div>
+          <div style="margin-bottom:6px;">② <strong>Caso 5</strong> — Agentes nuevos en K8s</div>
+          <div>③ <strong>Caso 6</strong> — Legacy que no migra a K8s</div>
+        </div>
+        <div style="margin-top:12px; font-size:12px; color:var(--ink-soft);">Timeline total: 4–8 semanas (por fase)</div>
+      </div>
+
+      <div style="border:1px solid var(--border); border-radius:10px; padding:18px; background:var(--card);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <span style="background:var(--purple-soft); color:var(--purple); font-size:11px; font-weight:700; padding:3px 10px; border-radius:4px; border:1px solid #c9b8f5;">COMBINACIÓN B</span>
+          <span style="font-size:13px; font-weight:600; color:var(--ink);">Defense-in-depth bancario</span>
+        </div>
+        <p style="font-size:12px; color:var(--ink-soft); margin-bottom:10px;">Para banca regulada con requisitos CMF/SBIF.</p>
+        <div style="font-size:13px; color:var(--ink-mid);">
+          <div style="margin-bottom:6px;">① <strong>Caso 2</strong> — Estándar para todos los agentes</div>
+          <div>② <strong>Caso 5</strong> — Agentes críticos con Policy as Code</div>
+        </div>
+        <div style="margin-top:12px; font-size:12px; color:var(--ink-soft);">Timeline total: 3–5 semanas</div>
+      </div>
+
+      <div style="border:1px solid var(--border); border-radius:10px; padding:18px; background:var(--card);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <span style="background:var(--teal-soft); color:var(--teal); font-size:11px; font-weight:700; padding:3px 10px; border-radius:4px; border:1px solid #a6dfd5;">COMBINACIÓN C</span>
+          <span style="font-size:13px; font-weight:600; color:var(--ink);">Shadow AI alto — LATAM financiero</span>
+        </div>
+        <p style="font-size:12px; color:var(--ink-soft); margin-bottom:10px;">Para entornos con alta adopción de IA no controlada.</p>
+        <div style="font-size:13px; color:var(--ink-mid);">
+          <div style="margin-bottom:6px;">① <strong>Caso 3</strong> — Discovery de tráfico no autorizado</div>
+          <div>② <strong>Caso 6</strong> — Gobierno del tráfico descubierto</div>
+        </div>
+        <div style="margin-top:12px; font-size:12px; color:var(--ink-soft);">Timeline total: 2–4 semanas</div>
+      </div>
+
+      <div style="border:1px solid var(--border); border-radius:10px; padding:18px; background:var(--card);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <span style="background:var(--amber-soft); color:var(--amber); font-size:11px; font-weight:700; padding:3px 10px; border-radius:4px; border:1px solid #f0d48a;">COMBINACIÓN D</span>
+          <span style="font-size:13px; font-weight:600; color:var(--ink);">Sin budget para cambios de red</span>
+        </div>
+        <p style="font-size:12px; color:var(--ink-soft); margin-bottom:10px;">Aprovecha NGFW existente con mínima fricción.</p>
+        <div style="font-size:13px; color:var(--ink-mid);">
+          <div style="margin-bottom:6px;">① <strong>Caso 4 Sub-A</strong> — Inspección vía ICAP</div>
+          <div style="color:var(--amber);">⚠ No soporta streaming de LLMs</div>
+        </div>
+        <div style="margin-top:12px; font-size:12px; color:var(--ink-soft);">Timeline total: 1–2 semanas</div>
+      </div>
+
+    </div>
+
+    <div class="divider" style="margin-top:28px;"></div>
+
+    <div class="desc-block" style="margin-top:20px;">
+      <h3>Guía de migración entre modos</h3>
+    </div>
+
+    <div class="tls-decision">
+      <h4>Rutas de migración más frecuentes</h4>
+      <div class="decision-row">
+        <span class="decision-badge db-a">1 → 2</span>
+        <span><strong>Bridge L2 a DMZ Egress</strong> — Motivo: pasar de PoC a producción regulada. Tiempo: 1–2 semanas. Riesgo: bajo — el bridge puede coexistir con la DMZ durante la transición. Pasos: desplegar EAB-64 en DMZ, configurar NAT en firewall, validar flujo, retirar bridge.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-a">4 → 5</span>
+        <span><strong>ICAP a Sidecar K8s</strong> — Motivo: necesitas streaming nativo y Policy as Code. Tiempo: 2–3 semanas. Riesgo: medio (requiere migrar agentes a K8s). Pasos: desplegar sidecars en Pods, validar políticas, migrar agentes uno a uno, deshabilitar ICAP para los migrados.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-b">6 → 5</span>
+        <span><strong>Reverse Proxy a Sidecar K8s</strong> — Motivo: escalar a arquitectura cloud-native. Tiempo: 2–3 semanas. Riesgo: bajo — el Reverse Proxy puede operar en paralelo durante la migración. Las políticas se migran del gateway central al plano de control de sidecars.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-b">3 → 2</span>
+        <span><strong>Behavioral SNI a DMZ Egress</strong> — Motivo: después del discovery, formalizar el enforcement en producción. Tiempo: 1–2 semanas. El Caso 3 puede operar en modo monitoreo mientras el Caso 2 se despliega en paralelo.</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── CASO 1 ─────────────────────────────────────────── -->
+<div class="case-block" id="caso1">
+  <div class="case-header">
+    <div class="case-number c1">1</div>
+    <div class="case-header-text">
+      <h2>Bridge transparente de capa 2</h2>
+      <p>El proxy se intercala físicamente en el enlace entre el switch de acceso y el firewall, sin IP enrutable propia en el flujo de datos.</p>
+    </div>
+  </div>
+  <div class="case-body">
+
+    <div class="desc-block">
+      <h3>Perfil de cliente ideal</h3>
+    </div>
+    <div class="profile-grid">
+      <div class="profile-item"><div class="pi-label">Tipo de organización</div><div class="pi-value">Cualquier empresa — también startups</div></div>
+      <div class="profile-item"><div class="pi-label">Madurez tecnológica</div><div class="pi-value">Baja a media — sin requisitos previos</div></div>
+      <div class="profile-item"><div class="pi-label">Objetivo inmediato</div><div class="pi-value">Validar EAB-64 sin comprometer infraestructura</div></div>
+      <div class="profile-item"><div class="pi-label">Volumen de agentes</div><div class="pi-value">1–50 agentes en piloto</div></div>
+    </div>
+    <div class="impl-row">
+      <div class="impl-chip"><div class="ic-label">Tiempo implementación</div><div class="ic-value">1–2 semanas</div></div>
+      <div class="impl-chip"><div class="ic-label">Costo relativo</div><div class="ic-value">Bajo</div></div>
+      <div class="impl-chip"><div class="ic-label">Cambios en aplicaciones</div><div class="ic-value">No</div></div>
+      <div class="impl-chip"><div class="ic-label">Requiere K8s</div><div class="ic-value">No</div></div>
+    </div>
+
+    <div class="desc-block"><h3>Requisitos mínimos de infraestructura</h3></div>
+    <table class="req-table">
+      <thead><tr><th>Requisito</th><th>Especificación</th></tr></thead>
+      <tbody>
+        <tr><td>Hardware de red</td><td>NIC con fail-open (bypass hardware) — ej. Silicom PE310G4BPI9, Netscout nTAP</td></tr>
+        <tr><td>Servidor proxy</td><td>2 interfaces físicas en el mismo host; mínimo 4 cores, 8GB RAM</td></tr>
+        <tr><td>Posición física</td><td>Acceso al cableado entre switch de acceso y firewall perimetral</td></tr>
+        <tr><td>VLAN de gestión</td><td>IP de gestión del proxy en VLAN separada del flujo de datos</td></tr>
+        <tr><td>Cambios en firewall</td><td>Ninguno</td></tr>
+      </tbody>
+    </table>
+    <div class="highlight-box" style="margin-bottom:20px; background:var(--amber-soft); border-left-color:var(--amber);">
+      <strong>Limitación de Policy as Code:</strong> el proxy aplica reglas de allowlist/blocklist pero no soporta políticas declarativas complejas tipo YAML/OPA. Para Policy as Code nativo, planificar migración al Caso 5 o Caso 6 en producción.
+    </div>
+
+    <div class="tag-row">
+      <span class="tag blue">Sin cambios de ruta en el cliente</span>
+      <span class="tag amber">Requiere bypass hardware</span>
+      <span class="tag teal">Invisible al firewall</span>
+    </div>
+
+    <div class="desc-block">
+      <h3>Cómo funciona</h3>
+      <p>El proxy dispone de dos interfaces físicas (NIC A y NIC B). El enlace que antes conectaba el switch de acceso al firewall perimetral se corta y el proxy se intercala en ese segmento. Opera en modo bridge de capa 2: reenvía todos los frames Ethernet de un lado al otro sin participar en el enrutamiento IP. Solo para el tráfico que identifica como flujo de IA — detectado por SNI en claro durante el handshake TLS — termina la sesión, inspecciona el contenido semántico y re-encripta antes de continuar. El resto del tráfico pasa sin ser tocado.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="flow-label">Flujo saliente — solicitud del agente hacia el LLM</div>
+    <div class="diagram-wrap">
+      <div class="flow-row">
+        <div class="flow-node n-gray">Agente IA<div class="sub">Red interna</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Switch<div class="sub">Capa 2</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">trunk L2</span></div>
+        <div class="flow-node n-blue">Proxy EAB-64<div class="sub">NIC A → NIC B</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">trunk L2</span></div>
+        <div class="flow-node n-teal">Firewall<div class="sub">Reglas L3/L4</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-coral">Internet / LLM</div>
+      </div>
+
+      <div class="flow-label" style="margin-top:16px">Flujo entrante — respuesta del LLM</div>
+      <div class="flow-row">
+        <div class="flow-node n-coral">Internet / LLM</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Firewall</div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">trunk L2</span></div>
+        <div class="flow-node n-blue">Proxy EAB-64<div class="sub">Inspección respuesta</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">trunk L2</span></div>
+        <div class="flow-node n-teal">Switch</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-gray">Agente IA</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Punto crítico — bypass hardware:</strong> el proxy incorpora un relé electrónico (NIC con fail-open) que, si el proceso principal falla o pierde alimentación, conecta NIC A y NIC B directamente por hardware sin pasar por CPU. Esto garantiza continuidad del tráfico sin inspección hasta que el proxy se recupere. Sin este componente, el Caso 1 introduce un punto único de falla inaceptable en entornos regulados.
+    </div>
+
+    <div class="desc-block">
+      <h3>Qué ve el firewall</h3>
+      <p>Tráfico normal entre la red interna e internet, exactamente igual que antes de instalar el proxy. El proxy no tiene IP en la tabla de rutas del firewall. Sí posee una IP de gestión, pero en una VLAN administrativa separada, accesible únicamente para operaciones de monitoreo y configuración.</p>
+    </div>
+
+    <div class="props-grid">
+      <div class="prop-box pro">
+        <h4>✓ Ventajas</h4>
+        <ul>
+          <li>Cero cambios en la configuración de rutas, DNS o reglas del firewall del cliente</li>
+          <li>Despliegue invisible — no requiere coordinación con el equipo de red</li>
+          <li>Adecuado para pruebas de concepto y onboarding rápido</li>
+          <li>Compatible con cualquier firewall existente sin importar el fabricante</li>
+        </ul>
+      </div>
+      <div class="prop-box con">
+        <h4>✗ Consideraciones</h4>
+        <ul>
+          <li>Requiere bypass hardware (fail-open NIC) — costo adicional de hardware</li>
+          <li>Intervención física en el cableado de red para instalación</li>
+          <li>Si no hay bypass, una caída del proxy corta el enlace completo</li>
+          <li>No es la topología recomendada para producción en entornos de alta criticidad</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── CASO 2 ─────────────────────────────────────────── -->
+<div class="case-block" id="caso2">
+  <div class="case-header">
+    <div class="case-number c2">2</div>
+    <div class="case-header-text">
+      <h2>Gateway de egress en DMZ dedicada</h2>
+      <p>El proxy opera en un segmento DMZ de egress, sin listener público. El firewall del cliente aplica sus reglas primero y hace NAT hacia el proxy para el tráfico de IA.</p>
+    </div>
+  </div>
+  <div class="case-body">
+
+    <div class="desc-block">
+      <h3>Perfil de cliente ideal</h3>
+    </div>
+    <div class="profile-grid">
+      <div class="profile-item"><div class="pi-label">Tipo de organización</div><div class="pi-value">Banca, seguros, fintech regulada (CMF/SBIF)</div></div>
+      <div class="profile-item"><div class="pi-label">Madurez tecnológica</div><div class="pi-value">Media a alta — equipo de red disponible</div></div>
+      <div class="profile-item"><div class="pi-label">Requisito regulatorio</div><div class="pi-value">Control de Leg 2 requerido por auditoría</div></div>
+      <div class="profile-item"><div class="pi-label">Volumen de agentes</div><div class="pi-value">50–500 agentes en producción</div></div>
+    </div>
+    <div class="impl-row">
+      <div class="impl-chip"><div class="ic-label">Tiempo implementación</div><div class="ic-value">2–3 semanas</div></div>
+      <div class="impl-chip"><div class="ic-label">Costo relativo</div><div class="ic-value">Medio</div></div>
+      <div class="impl-chip"><div class="ic-label">Cambios en aplicaciones</div><div class="ic-value">No</div></div>
+      <div class="impl-chip"><div class="ic-label">Requiere K8s</div><div class="ic-value">No</div></div>
+    </div>
+    <div class="desc-block"><h3>Requisitos mínimos de infraestructura</h3></div>
+    <table class="req-table">
+      <thead><tr><th>Requisito</th><th>Especificación</th></tr></thead>
+      <tbody>
+        <tr><td>Firewall</td><td>Cualquier firewall stateful con soporte NAT — no requiere NGFW</td></tr>
+        <tr><td>Segmento DMZ</td><td>VLAN dedicada sin listener público; solo tráfico originado desde el proxy hacia internet</td></tr>
+        <tr><td>NAT rules</td><td>Regla de NAT para redirigir tráfico de IA (por IP destino o puerto) desde red interna hacia proxy en DMZ</td></tr>
+        <tr><td>Servidor proxy</td><td>Mínimo 4 cores, 16GB RAM; recomendado modo cluster activo-pasivo para HA</td></tr>
+        <tr><td>Certificados TLS</td><td>CA interna para Leg 1; credenciales de LLM provider para Leg 2</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tag-row">
+      <span class="tag purple">Defense-in-depth</span>
+      <span class="tag teal">Sin exposición al perímetro</span>
+      <span class="tag blue">Recomendado para producción</span>
+    </div>
+
+    <div class="desc-block">
+      <h3>Cómo funciona</h3>
+      <p>El firewall del cliente actúa como primera línea de defensa, aplicando scrubbing barato de capas 3 y 4 (descarte de IPs maliciosas, DDoS volumétrico, tráfico malformado). El tráfico que supera ese filtro y que el firewall identifica como destinado a APIs de IA es redirigido por NAT hacia el proxy EAB-64, que reside en un segmento DMZ sin IP pública propia. El proxy termina el TLS, inspecciona el contenido semántico, aplica las políticas EAB-64 y abre una nueva conexión TLS hacia el LLM externo. Solo recibe el tráfico de retorno de las sesiones que él mismo estableció.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="flow-label">Flujo saliente — solicitud del agente hacia el LLM</div>
+    <div class="diagram-wrap">
+      <div class="flow-row">
+        <div class="flow-node n-gray">Agente IA<div class="sub">Red interna</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Firewall<div class="sub">Reglas L3/L4 + NAT</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">NAT → DMZ</span></div>
+        <div class="flow-node n-purple">Proxy EAB-64<div class="sub">DMZ · sin IP pública</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">nueva sesión TLS</span></div>
+        <div class="flow-node n-coral">Internet / LLM</div>
+      </div>
+
+      <div class="flow-label" style="margin-top:16px">Flujo entrante — respuesta del LLM (misma sesión TLS establecida por el proxy)</div>
+      <div class="flow-row">
+        <div class="flow-node n-coral">Internet / LLM</div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">rpta. sesión TLS</span></div>
+        <div class="flow-node n-purple">Proxy EAB-64<div class="sub">Inspección semántica</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">re-encripta</span></div>
+        <div class="flow-node n-teal">Firewall<div class="sub">Reenvío interno</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-gray">Agente IA</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Aclaración sobre lo que recibe el proxy en el retorno:</strong> el proxy solo recibe las respuestas de las sesiones TLS que él mismo abrió hacia el LLM externo. No ve ni recibe el tráfico de retorno de otras conexiones del cliente hacia internet — ese tráfico regresa al firewall directamente por su propio estado de sesión y nunca pasa por la DMZ del proxy.
+    </div>
+
+    <div class="desc-block">
+      <h3>Postura de seguridad del proxy en la DMZ</h3>
+      <p>El proxy no tiene ningún listener activo accesible desde internet. Solo inicia conexiones salientes hacia LLMs externos. El firewall perimetral mantiene el estado de las conexiones entre la red interna y el proxy, y entre el proxy e internet, en segmentos separados. Un atacante externo no puede iniciar una conexión hacia el proxy porque no existe ningún puerto de escucha expuesto al WAN.</p>
+    </div>
+
+    <div class="props-grid">
+      <div class="prop-box pro">
+        <h4>✓ Ventajas</h4>
+        <ul>
+          <li>Topología más defendible ante reguladores — defense-in-depth comprobable</li>
+          <li>El firewall del cliente filtra ruido barato antes de que el proxy gaste recursos semánticos</li>
+          <li>Proxy sin superficie de ataque externa — no escucha conexiones entrantes del WAN</li>
+          <li>Sin punto único de falla de hardware — el proxy está en alta disponibilidad lógica</li>
+        </ul>
+      </div>
+      <div class="prop-box con">
+        <h4>✗ Consideraciones</h4>
+        <ul>
+          <li>Requiere reconfigurar reglas NAT y rutas en el firewall existente del cliente</li>
+          <li>Necesita coordinación con el equipo de red para aprovisionar el segmento DMZ</li>
+          <li>El firewall debe mantener la lista de destinos de IA para hacer el NAT correctamente</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── CASO 3 ─────────────────────────────────────────── -->
+<div class="case-block" id="caso3">
+  <div class="case-header">
+    <div class="case-number c3">3</div>
+    <div class="case-header-text">
+      <h2>Proxy selectivo por SNI con detección comportamental</h2>
+      <p>El proxy aplica inspección TLS solo al subconjunto identificado como tráfico de IA. Cuando el SNI no está disponible o no es reconocido, un motor de puntuación comportamental de costo casi cero determina si el flujo merece inspección completa.</p>
+    </div>
+  </div>
+  <div class="case-body">
+
+    <div class="tag-row">
+      <span class="tag teal">Mínimo overhead TLS</span>
+      <span class="tag purple">Discovery de shadow AI</span>
+      <span class="tag coral">CA firmante acotada a flujos IA</span>
+      <span class="tag amber">Detección de VPN bypass</span>
+      <span class="tag blue">Behavioral scoring sin abrir TLS</span>
+    </div>
+
+    <div class="desc-block"><h3>Perfil de cliente ideal</h3></div>
+    <div class="profile-grid">
+      <div class="profile-item"><div class="pi-label">Tipo de organización</div><div class="pi-value">Financiero LATAM con adopción de IA acelerada</div></div>
+      <div class="profile-item"><div class="pi-label">Madurez tecnológica</div><div class="pi-value">Alta — equipo de seguridad proactivo</div></div>
+      <div class="profile-item"><div class="pi-label">Problema principal</div><div class="pi-value">Shadow AI alto — agentes no enrolados accediendo a LLMs</div></div>
+      <div class="profile-item"><div class="pi-label">Volumen de agentes</div><div class="pi-value">Desconocido — el discovery lo determina</div></div>
+    </div>
+    <div class="impl-row">
+      <div class="impl-chip"><div class="ic-label">Tiempo implementación</div><div class="ic-value">1–3 semanas</div></div>
+      <div class="impl-chip"><div class="ic-label">Costo relativo</div><div class="ic-value">Medio-alto</div></div>
+      <div class="impl-chip"><div class="ic-label">Cambios en aplicaciones</div><div class="ic-value">Sí — proxy explícito o intercepción egress</div></div>
+      <div class="impl-chip"><div class="ic-label">Requiere K8s</div><div class="ic-value">No</div></div>
+    </div>
+    <div class="highlight-box" style="margin-bottom:20px; background:var(--amber-soft); border-left-color:var(--amber);">
+      <strong>Fricción de despliegue importante:</strong> las aplicaciones deben soportar variables de entorno <code>HTTPS_PROXY</code> / <code>HTTP_PROXY</code> o configuración explícita de proxy. No es transparente para el desarrollador como el Caso 1 o el Caso 2. Requiere coordinación con equipos de desarrollo para configurar cada agente.
+    </div>
+    <div class="desc-block"><h3>Requisitos mínimos de infraestructura</h3></div>
+    <table class="req-table">
+      <thead><tr><th>Requisito</th><th>Especificación</th></tr></thead>
+      <tbody>
+        <tr><td>Proxy explícito o intercepción</td><td>Variable HTTPS_PROXY configurada en agentes, o intercepción transparente en egress de red interna</td></tr>
+        <tr><td>Servidor proxy</td><td>Mínimo 8 cores, 16GB RAM (el scoring comportamental es CPU-intensivo a escala)</td></tr>
+        <tr><td>Base de JA3 fingerprints</td><td>Base de datos actualizable de fingerprints de SDKs de LLMs conocidos</td></tr>
+        <tr><td>CA interna</td><td>Solo para agentes en Caso A y B confirmado — no para el 100% del tráfico</td></tr>
+        <tr><td>SOC / SIEM</td><td>Receptor de alertas de VPN bypass e intentos de evasión en modo informativo</td></tr>
+      </tbody>
+    </table>
+
+    <div class="desc-block">
+      <h3>Cómo funciona</h3>
+      <p>El proxy intercepta el tráfico HTTPS saliente y evalúa cada flujo en dos capas secuenciales antes de decidir si termina el TLS. La primera capa es de costo prácticamente cero: lee campos que viajan en claro antes o durante el handshake TLS (SNI, JA3 fingerprint, heurísticas de naming). La segunda capa — headers HTTP — solo se evalúa si la primera genera señal. El body del request (JSON payloads) es la última instancia, solo activada cuando las capas anteriores superan el umbral de puntuación. Esta estratificación garantiza que el 80–90% del tráfico corporativo no relacionado con IA pase sin ningún costo de inspección.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="desc-block">
+      <h3>Motor de detección comportamental — indicadores por costo de evaluación</h3>
+      <p>Los indicadores se ordenan de menor a mayor costo. El proxy los evalúa en secuencia y detiene la evaluación cuando el score acumulado supera el umbral de clasificación, evitando trabajo innecesario.</p>
+    </div>
+
+    <div class="tls-decision">
+      <h4>Capa 1 — Costo cero: disponibles antes o durante el Client Hello TLS (sin terminar sesión)</h4>
+
+      <div class="decision-row">
+        <span class="decision-badge db-a">SNI EXPLÍCITO</span>
+        <span><strong>Server Name Indication en claro.</strong> El campo SNI del Client Hello viaja sin cifrar. Si coincide con un dominio de IA conocido (api.anthropic.com, api.openai.com, generativelanguage.googleapis.com, etc.) la clasificación es inmediata con score máximo. Peso: determinístico — no requiere puntuación adicional.</span>
+      </div>
+
+      <div class="decision-row">
+        <span class="decision-badge db-a">NAMING</span>
+        <span><strong>Heurísticas de naming sobre el SNI.</strong> Cuando el SNI no está en la lista conocida, se analiza su estructura: prefijos <code>api.*</code>, <code>chat.*</code>, <code>inference.*</code>, <code>llm.*</code>; sufijos <code>*.ai</code>, <code>*.openai.*</code>; subdominios con segmentos <code>-api-</code> o <code>-llm-</code>. Costo: una comparación de regex sobre el string SNI, microsegundos. Peso: medio — fuerte signal pero no determinístico (existen servicios <code>*.ai</code> no relacionados con IA generativa).</span>
+      </div>
+
+      <div class="decision-row">
+        <span class="decision-badge db-a">JA3 / JA4</span>
+        <span><strong>TLS fingerprint del Client Hello.</strong> El hash JA3 se calcula sobre la versión TLS, cipher suites ofrecidas, extensiones, grupos elípticos y formatos de punto — todos campos del Client Hello, disponibles sin terminar la sesión. Las librerías Python <code>httpx</code> y <code>requests</code> (usadas por los SDKs de Anthropic, OpenAI y otros) producen fingerprints JA3 estables y distinguibles de cualquier browser moderno. JA4 (sucesor, 2024) añade el orden de extensiones TLS para mayor precisión. Un JA3 que coincide con fingerprint de SDK de IA eleva el score significativamente. Costo: un hash MD5 sobre ~200 bytes del Client Hello, nanosegundos. Peso: alto cuando combina con naming o SNI conocido; medio en aislamiento (librerías Python tienen otros usos legítimos).</span>
+      </div>
+    </div>
+
+    <div class="tls-decision" style="margin-top:12px;">
+      <h4>Capa 2 — Costo bajo: headers HTTP en claro (sin terminar TLS en modo CONNECT)</h4>
+      <p style="font-size:13px; color:var(--ink-soft); margin-bottom:12px;">En modo proxy explícito, los headers del CONNECT request y los headers HTTP/1.1 de la petición interna son accesibles sin necesidad de terminar el TLS completo.</p>
+
+      <div class="decision-row">
+        <span class="decision-badge db-b">USER-AGENT</span>
+        <span><strong>SDK signatures en User-Agent.</strong> Strings como <code>openai-python/1.x</code>, <code>anthropic-python/0.x</code>, <code>langchain/0.x</code>, <code>litellm/1.x</code> son prácticamente determinísticos — ningún usuario humano navega con esos strings. Peso: muy alto, casi determinístico en ausencia de ofuscación deliberada.</span>
+      </div>
+
+      <div class="decision-row">
+        <span class="decision-badge db-b">AUTH FLOW</span>
+        <span><strong>Patrón Bearer token + refresh.</strong> Headers <code>Authorization: Bearer sk-...</code> con prefijos propietarios de los proveedores (sk-ant-, sk-proj-, etc.) son señal fuerte. El patrón de refresh OAuth2 (secuencia POST a <code>/oauth/token</code> seguida de GET a un endpoint de inference) es detectable por la secuencia de requests sin inspeccionar el body. Peso: alto.</span>
+      </div>
+
+      <div class="decision-row">
+        <span class="decision-badge db-b">HEADERS PROPIETARIOS</span>
+        <span><strong>Headers específicos de SDKs.</strong> <code>X-Request-ID</code> con formato UUID prefijado (patrón de Anthropic), <code>anthropic-version</code>, <code>openai-beta</code>, <code>X-Stainless-*</code> (librería Stainless que usan varios SDKs). Costo: lookup en tabla hash de strings, microsegundos. Peso: alto cuando aparecen combinados.</span>
+      </div>
+    </div>
+
+    <div class="tls-decision" style="margin-top:12px;">
+      <h4>Capa 3 — Costo medio: análisis de comportamiento de sesión (sin abrir body)</h4>
+
+      <div class="decision-row">
+        <span class="decision-badge db-c">STREAMING</span>
+        <span><strong>Chunked Transfer-Encoding con duración extendida.</strong> Las respuestas de LLMs en streaming usan <code>Transfer-Encoding: chunked</code> con sesiones de larga duración (segundos a minutos) y chunks de tamaño pequeño e irregular — patrón opuesto al de video streaming (chunks grandes y regulares). Detectable en el perfil temporal de la sesión sin abrir el contenido. Peso: medio — requiere combinación con otros indicadores.</span>
+      </div>
+
+      <div class="decision-row">
+        <span class="decision-badge db-c">RATE PATTERNS</span>
+        <span><strong>Respuestas 429 con Retry-After.</strong> Las APIs de LLMs tienen rate limits estrictos y responden con 429 y header <code>Retry-After</code> o <code>x-ratelimit-reset-requests</code>. Un flujo que recibe 429s repetidos hacia el mismo destino es señal fuerte de consumo programático de API, no de navegación humana. Peso: medio-alto en combinación.</span>
+      </div>
+
+      <div class="decision-row">
+        <span class="decision-badge db-c">VPN/TUNNEL</span>
+        <span><strong>Intentos de bypass por túnel.</strong> Handshakes que coinciden con fingerprints de WireGuard, OpenVPN o similares hacia destinos que ya tienen score de IA elevado. Se registra y notifica al SOC en modo informativo — no se bloquea para evitar falsos positivos con herramientas legítimas (Cloudflare WARP, Zero Trust clients). Peso: no suma al score de IA, activa alerta de evasión independiente.</span>
+      </div>
+    </div>
+
+    <div class="highlight-box" style="margin-top:16px;">
+      <strong>Modelo de dos umbrales para minimizar terminaciones TLS:</strong><br>
+      Score &lt; 0.40 → Caso C: reenvío opaco sin terminar TLS.<br>
+      Score 0.40–0.74 → Candidato: se termina TLS para confirmar con análisis de payload (Capa 4, bajo demanda).<br>
+      Score ≥ 0.75 → Clasificación directa como tráfico de IA: se aplica enforcement EAB-64 completo sin esperar confirmación de payload.
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="tls-decision">
+      <h4>Árbol de decisión por conexión saliente (integra scoring comportamental)</h4>
+      <div class="decision-row">
+        <span class="decision-badge db-a">CASO A</span>
+        <span><strong>SNI conocido de IA O score comportamental ≥ 0.75</strong> — el proxy termina el TLS, inspecciona el prompt/respuesta, aplica políticas EAB-64 y, si es benigno, lo reenvía al firewall. Requiere certificado raíz solo en el agente o aplicación que genera ese tráfico.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-b">CASO B</span>
+        <span><strong>Score comportamental 0.40–0.74 (candidato sin SNI claro)</strong> — el proxy termina TLS para confirmar con análisis de payload. Si confirma tráfico de IA: aplica allowlist de agentes enrolados; si está autorizado lo pasa al firewall, si no corta con error HTTP y registra para el SOC. Si no confirma tráfico de IA: rebaja a Caso C.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-c">CASO C</span>
+        <span><strong>Score &lt; 0.40 — tráfico no relacionado con IA</strong> — reenvío opaco al firewall sin terminar TLS ni gastar recursos de inspección semántica.</span>
+      </div>
+    </div>
+
+    <div class="flow-label" style="margin-top:20px;">Flujo de decisión con scoring</div>
+    <div class="diagram-wrap">
+      <div class="flow-row">
+        <div class="flow-node n-gray">Agente / App<div class="sub">Red interna</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Proxy EAB-64<div class="sub">Capa 1: SNI + JA3 + naming</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-blue" style="min-width:130px">Score acumulado<div class="sub">Capas 1→2→3</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-purple" style="min-width:120px">Umbral A/B/C<div class="sub">Decisión de política</div></div>
+      </div>
+      <div style="margin:14px 0 8px 158px; font-size:13px; color:var(--ink-soft);">↓ según resultado:</div>
+      <div class="flow-row" style="margin-left:80px;">
+        <div class="flow-node n-purple" style="min-width:130px">A: enforcement<div class="sub">TLS + EAB-64</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Firewall</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-coral">LLM externo</div>
+      </div>
+      <div class="flow-row" style="margin-left:80px; margin-top:8px;">
+        <div class="flow-node n-amber" style="min-width:130px">B: confirm + allowlist<div class="sub">TLS bajo demanda</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Firewall</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-coral">Destino ext.</div>
+      </div>
+      <div class="flow-row" style="margin-left:80px; margin-top:8px;">
+        <div class="flow-node n-gray" style="min-width:130px">C: reenvío opaco<div class="sub">Sin terminar TLS</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Firewall</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-gray">Internet</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Sobre la CA firmante:</strong> solo necesaria para Caso A y el subconjunto confirmado de Caso B. No se requiere desplegar certificados raíz en browsers de usuarios finales — únicamente en agentes y aplicaciones que generan tráfico de IA. El scoring comportamental de Capa 1 opera sin CA, sin terminar TLS, sin ningún cambio en la PKI del cliente.
+    </div>
+
+    <div class="desc-block">
+      <h3>Tabla de indicadores — confiabilidad y costo</h3>
+      <table class="compare-table" style="margin-top:8px;">
+        <thead>
+          <tr>
+            <th>Indicador</th>
+            <th>Capa</th>
+            <th>Costo de evaluación</th>
+            <th>Confiabilidad</th>
+            <th>Requiere terminar TLS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>SNI explícito conocido</td><td>1</td><td>Nanosegundos — lookup en tabla hash</td><td>Determinístico</td><td>No</td></tr>
+          <tr><td>Heurísticas de naming (api.*, *.ai)</td><td>1</td><td>Microsegundos — regex sobre string SNI</td><td>Media-alta</td><td>No</td></tr>
+          <tr><td>JA3 / JA4 fingerprint</td><td>1</td><td>Nanosegundos — hash MD5/SHA sobre ~200B</td><td>Alta en combinación</td><td>No</td></tr>
+          <tr><td>SDK User-Agent</td><td>2</td><td>Microsegundos — string match en header</td><td>Muy alta (casi determinística)</td><td>No (proxy CONNECT)</td></tr>
+          <tr><td>Bearer token con prefijo propietario</td><td>2</td><td>Microsegundos — regex sobre Authorization header</td><td>Alta</td><td>No (proxy CONNECT)</td></tr>
+          <tr><td>Headers propietarios SDK</td><td>2</td><td>Microsegundos — lookup en tabla</td><td>Alta en combinación</td><td>No (proxy CONNECT)</td></tr>
+          <tr><td>Streaming chunked + duración</td><td>3</td><td>Milisegundos — análisis temporal de sesión</td><td>Media</td><td>No (metadatos de sesión)</td></tr>
+          <tr><td>Patrón 429 + Retry-After</td><td>3</td><td>Microsegundos — inspección de response code</td><td>Media-alta</td><td>No</td></tr>
+          <tr><td>JSON body &gt;10KB</td><td>4</td><td>Milisegundos — lectura y parsing parcial</td><td>Alta</td><td>Sí — solo si score previo &gt; 0.40</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="props-grid" style="margin-top:20px;">
+      <div class="prop-box pro">
+        <h4>✓ Ventajas</h4>
+        <ul>
+          <li>Detección de tráfico de IA sin depender de lista de SNIs — resiliente a nuevos proveedores y endpoints</li>
+          <li>JA3 + SDK User-Agent juntos son prácticamente determinísticos sin abrir ningún payload</li>
+          <li>Heurísticas de naming capturan dominios nuevos de IA antes de que se actualice cualquier lista</li>
+          <li>Modelo de dos umbrales minimiza terminaciones TLS innecesarias al 80–90% del tráfico</li>
+          <li>Toda señal de scoring queda en el log de auditoría — trazabilidad completa para la cadena de custodia EAB-64</li>
+        </ul>
+      </div>
+      <div class="prop-box con">
+        <h4>✗ Consideraciones</h4>
+        <ul>
+          <li>JA3 tiene cierta variabilidad entre versiones de librería — requiere actualización periódica de la base de fingerprints</li>
+          <li>Heurísticas de naming generan falsos positivos con servicios <code>*.ai</code> no relacionados con IA generativa (ej. servicios de automatización industrial)</li>
+          <li>Agentes que ofuscan deliberadamente User-Agent o usan proxies intermedios reducen la efectividad de Capa 2</li>
+          <li>Detección de VPN bypass en modo informativo requiere que el SOC actúe sobre las alertas para ser efectiva</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── COMPARATIVA ────────────────────────────────────── -->
+<!-- ─── CASO 4 ─────────────────────────────────────────── -->
+<div class="case-block" id="caso4">
+  <div class="case-header">
+    <div class="case-number c1" style="background:var(--amber-soft);color:var(--amber);">4</div>
+    <div class="case-header-text">
+      <h2>Integración vía ICAP — Firewall como terminador TLS</h2>
+      <p>El firewall enterprise realiza la inspección SSL y delega el análisis semántico a EAB-64 como servidor ICAP. EAB-64 nunca está en el path de red directo.</p>
+    </div>
+  </div>
+  <div class="case-body">
+
+    <div class="desc-block"><h3>Perfil de cliente ideal</h3></div>
+    <div class="profile-grid">
+      <div class="profile-item"><div class="pi-label">Tipo de organización</div><div class="pi-value">Enterprise con NGFW ya en producción</div></div>
+      <div class="profile-item"><div class="pi-label">Madurez tecnológica</div><div class="pi-value">Alta — SSL inspection ya habilitado</div></div>
+      <div class="profile-item"><div class="pi-label">Restricción principal</div><div class="pi-value">Sin budget ni autorización para cambios de red</div></div>
+      <div class="profile-item"><div class="pi-label">Limitación crítica</div><div class="pi-value">Agentes NO deben usar streaming de LLMs</div></div>
+    </div>
+    <div class="impl-row">
+      <div class="impl-chip"><div class="ic-label">Tiempo implementación</div><div class="ic-value">1–2 semanas</div></div>
+      <div class="impl-chip"><div class="ic-label">Costo relativo</div><div class="ic-value">Bajo</div></div>
+      <div class="impl-chip"><div class="ic-label">Cambios en aplicaciones</div><div class="ic-value">No</div></div>
+      <div class="impl-chip"><div class="ic-label">Requiere K8s</div><div class="ic-value">No</div></div>
+    </div>
+    <div class="desc-block"><h3>Requisitos mínimos de infraestructura</h3></div>
+    <table class="req-table">
+      <thead><tr><th>Requisito</th><th>Especificación</th></tr></thead>
+      <tbody>
+        <tr><td>Firewall</td><td>NGFW enterprise con SSL inspection nativo y cliente ICAP: Palo Alto PAN-OS 10.2+ / Fortinet FortiGate 7.0+ / CheckPoint R81.10+</td></tr>
+        <tr><td>SSL Inspection</td><td>Habilitado y configurado para destinos de IA — CA interna instalada en el firewall</td></tr>
+        <tr><td>Cliente ICAP</td><td>Soporte nativo RFC 3507 — verificar versión de firmware antes de proponer</td></tr>
+        <tr><td>Timeout ICAP</td><td>Configurable a mínimo 180 segundos (ver configuraciones por fabricante en detalle del caso)</td></tr>
+        <tr><td>Servidor EAB-64</td><td>Mínimo 4 cores, 32GB RAM (buffering de body completo por sesión ICAP)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tag-row">
+      <span class="tag amber">Requiere NGFW con SSL inspection</span>
+      <span class="tag teal">EAB-64 sin exposición de red</span>
+      <span class="tag blue">Menor cambio en infraestructura</span>
+      <span class="tag coral">Limitaciones con streaming</span>
+    </div>
+
+    <div class="desc-block">
+      <h3>Qué es ICAP y por qué aplica aquí</h3>
+      <p>ICAP (Internet Content Adaptation Protocol, RFC 3507) es un protocolo liviano que permite a un proxy o firewall externalizar la inspección o modificación de contenido HTTP a un servidor especializado, sin que el cliente final conozca su existencia. El firewall actúa como cliente ICAP: termina la sesión TLS con el agente, desencripta el contenido, lo envía al servidor ICAP (EAB-64) para análisis, recibe el veredicto y reencripta para continuar el flujo. EAB-64 opera como un servicio de análisis puro — no mantiene sesiones de red con el exterior.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="desc-block">
+      <h3>Sub-variante A — Firewall termina TLS en ambas direcciones (recomendada)</h3>
+    </div>
+
+    <div class="flow-label">Flujo saliente</div>
+    <div class="diagram-wrap">
+      <div class="flow-row">
+        <div class="flow-node n-gray">Agente IA<div class="sub">Red interna</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Firewall NGFW<div class="sub">Termina TLS · detecta IA</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">ICAP REQMOD</span></div>
+        <div class="flow-node n-amber">EAB-64<div class="sub">Servidor ICAP · analiza</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">veredicto</span></div>
+        <div class="flow-node n-teal">Firewall NGFW<div class="sub">Re-encripta · envía</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-coral">LLM externo</div>
+      </div>
+      <div class="flow-label" style="margin-top:16px">Flujo entrante — respuesta del LLM</div>
+      <div class="flow-row">
+        <div class="flow-node n-coral">LLM externo</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-teal">Firewall NGFW<div class="sub">Termina TLS · desencripta</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">ICAP RESPMOD</span></div>
+        <div class="flow-node n-amber">EAB-64<div class="sub">Inspección semántica</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">204 / 200 / block</span></div>
+        <div class="flow-node n-teal">Firewall NGFW<div class="sub">Re-encripta · entrega</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node n-gray">Agente IA</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Control de Leg 2 en Sub-variante A:</strong> el firewall es quien abre y sostiene la sesión TLS hacia el LLM externo — EAB-64 solo inspecciona el contenido en claro vía ICAP. Esto implica que el enforcement de Leg 2 recae en las capacidades del firewall, no en EAB-64. Para entornos donde la política regulatoria exige que EAB-64 sea el punto de enforcement de Leg 2, se debe usar Sub-variante B o los Casos 2, 5 ó 6.
+    </div>
+
+    <div class="desc-block" style="margin-top:20px;">
+      <h3>Sub-variante B — EAB-64 abre sesión TLS de Leg 2 desde dentro del flujo ICAP</h3>
+      <p>En esta variante, cuando EAB-64 recibe el request vía ICAP REQMOD, en vez de devolver un veredicto inmediato, abre él mismo la sesión TLS hacia el LLM externo, obtiene la respuesta, la inspecciona y la devuelve al firewall vía ICAP. El firewall la entrega al agente re-encriptada. Esto preserva el enforcement de Leg 2 en EAB-64, pero introduce las limitaciones que se documentan a continuación.</p>
+    </div>
+
+    <div class="tls-decision">
+      <h4>Limitaciones críticas de ICAP en Sub-variante B — documentadas</h4>
+
+      <div class="decision-row">
+        <span class="decision-badge db-c">STREAMING</span>
+        <span><strong>ICAP no es streaming-native.</strong> RFC 3507 define un modelo de request-response completo: el servidor ICAP recibe el body entero, lo procesa y devuelve el body modificado. Las respuestas de LLMs en streaming (Server-Sent Events, chunked transfer) pueden durar de segundos a varios minutos. ICAP no tiene mecanismo nativo para transmitir chunks de vuelta al cliente conforme llegan — debe buffering completo antes de responder, lo que destruye la experiencia de streaming. <strong>ICAP NO es recomendable cuando el cliente requiere streaming de respuestas de LLM.</strong></span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-c">TIMEOUTS</span>
+        <span><strong>Timeouts ICAP incompatibles con latencias de LLM.</strong> Los firewalls enterprise tienen timeouts ICAP configurados para inspección de contenido web típico (segundos). Las respuestas de LLMs complejas pueden exceder 60–120 segundos. Si el timeout ICAP del firewall expira antes de que EAB-64 reciba la respuesta del LLM, el firewall corta la conexión y el agente recibe un error. Configuraciones de timeout por firewall documentadas más abajo.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-c">BUFFERING</span>
+        <span><strong>Consumo de memoria proporcional al tamaño de respuesta.</strong> EAB-64 debe mantener en memoria el body completo del request y la respuesta del LLM simultáneamente durante el procesamiento ICAP. Para prompts largos con contexto extenso (100K+ tokens), esto puede representar varios MB por sesión concurrente. A escala de producción con cientos de agentes concurrentes, el consumo de RAM de EAB-64 en modo ICAP puede ser un orden de magnitud mayor que en los otros modos de despliegue.</span>
+      </div>
+    </div>
+
+    <div class="tls-decision" style="margin-top:16px;">
+      <h4>Guía técnica — cuándo usar ICAP y cuándo no</h4>
+      <div class="decision-row">
+        <span class="decision-badge db-a">USAR</span>
+        <span>El cliente ya tiene un NGFW enterprise con SSL inspection habilitado (Palo Alto, Fortinet FortiGate, CheckPoint, Cisco FTD) y no puede modificar la arquitectura de red. Los agentes usan comunicación request-response síncrona sin streaming. El volumen de sesiones concurrentes de IA es bajo-medio (menos de 50 sesiones simultáneas). Se prioriza la simplicidad de despliegue de EAB-64 sobre el control completo de Leg 2.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-c">NO USAR</span>
+        <span>Los agentes usan streaming de respuestas (SSE, chunked). El tiempo de respuesta del LLM puede superar 60 segundos en producción. Se requiere que EAB-64 sea el punto de enforcement de Leg 2 por política regulatoria. El volumen de sesiones concurrentes supera las 100 simultáneas (riesgo de OOM por buffering). El firewall existente no soporta ICAP client nativo.</span>
+      </div>
+    </div>
+
+    <div class="tls-decision" style="margin-top:16px;">
+      <h4>Configuraciones de timeout ICAP por firewall — referencia</h4>
+      <div class="decision-row">
+        <span class="decision-badge db-a">Palo Alto</span>
+        <span><code>set deviceconfig setting management icap-timeout &lt;segundos&gt;</code> — default 15s. Para Sub-variante B con LLMs, configurar mínimo 180s. Ruta: Device → Setup → Management → ICAP.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-a">Fortinet</span>
+        <span><code>config icap server → set max-conn-timeout &lt;seg&gt;</code> y <code>set request-timeout &lt;seg&gt;</code> — defaults 75s y 30s respectivamente. Para LLMs: <code>request-timeout 180</code>, <code>max-conn-timeout 300</code>.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-a">CheckPoint</span>
+        <span>Content Awareness blade → ICAP External Server → Connection Timeout: default 30s. Modificar vía SmartConsole a 180s mínimo. Requiere R81.10+.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-b">Cisco FTD</span>
+        <span>FTD no soporta ICAP client nativo en versiones anteriores a 7.4. Verificar versión antes de proponer este caso. Alternativa: usar Cisco WSA (Web Security Appliance) como proxy intermedio con cliente ICAP.</span>
+      </div>
+    </div>
+
+    <div class="props-grid" style="margin-top:20px;">
+      <div class="prop-box pro">
+        <h4>✓ Ventajas</h4>
+        <ul>
+          <li>EAB-64 sin ninguna interfaz de red expuesta — listener ICAP accesible solo desde IP del firewall</li>
+          <li>Mínimos cambios en infraestructura si el NGFW ya tiene SSL inspection activo</li>
+          <li>El firewall mantiene todas las capacidades de logging y correlación de eventos que ya tiene</li>
+          <li>Sub-variante A es la de menor complejidad operativa de todos los casos documentados</li>
+        </ul>
+      </div>
+      <div class="prop-box con">
+        <h4>✗ Consideraciones</h4>
+        <ul>
+          <li>Requiere NGFW enterprise con SSL inspection y cliente ICAP — no todos los firewalls lo soportan</li>
+          <li>Sub-variante B incompatible con streaming de LLMs sin configuración especial de timeouts</li>
+          <li>Sub-variante A delega el control de Leg 2 al firewall, debilitando el enforcement de EAB-64</li>
+          <li>Consumo de RAM elevado en Sub-variante B con prompts de contexto largo</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── CASO 5 ─────────────────────────────────────────── -->
+<div class="case-block" id="caso5">
+  <div class="case-header">
+    <div class="case-number c2" style="background:var(--green-soft);color:var(--green);">5</div>
+    <div class="case-header-text">
+      <h2>Sidecar Proxy con Envoy — Agentes en Kubernetes</h2>
+      <p>EAB-64 se despliega como contenedor sidecar junto a cada agente en el mismo Pod de Kubernetes. Zero dependencia del firewall de red. Policy as Code nativo. Streaming sin restricciones.</p>
+    </div>
+  </div>
+  <div class="case-body">
+
+    <div class="desc-block"><h3>Perfil de cliente ideal</h3></div>
+    <div class="profile-grid">
+      <div class="profile-item"><div class="pi-label">Tipo de organización</div><div class="pi-value">Fintech, banco digital, startup regulada</div></div>
+      <div class="profile-item"><div class="pi-label">Madurez tecnológica</div><div class="pi-value">Alta — equipo de plataforma cloud-native</div></div>
+      <div class="profile-item"><div class="pi-label">Requisito principal</div><div class="pi-value">Policy as Code, auditabilidad por agente, streaming</div></div>
+      <div class="profile-item"><div class="pi-label">Volumen de agentes</div><div class="pi-value">10–1000+ pods con agentes de IA</div></div>
+    </div>
+    <div class="impl-row">
+      <div class="impl-chip"><div class="ic-label">Tiempo implementación</div><div class="ic-value">1–3 semanas</div></div>
+      <div class="impl-chip"><div class="ic-label">Costo relativo</div><div class="ic-value">Medio</div></div>
+      <div class="impl-chip"><div class="ic-label">Cambios en aplicaciones</div><div class="ic-value">No (iptables transparente)</div></div>
+      <div class="impl-chip"><div class="ic-label">Requiere K8s</div><div class="ic-value">Sí — obligatorio</div></div>
+    </div>
+    <div class="desc-block"><h3>Requisitos mínimos de infraestructura</h3></div>
+    <table class="req-table">
+      <thead><tr><th>Requisito</th><th>Especificación</th></tr></thead>
+      <tbody>
+        <tr><td>Kubernetes</td><td>K8s 1.24+ — EKS, GKE, AKS o on-premise con Calico/Cilium CNI</td></tr>
+        <tr><td>Init container</td><td>Privilegiado para inyección de reglas iptables (equivalente al patrón de Istio)</td></tr>
+        <tr><td>Recursos por sidecar</td><td>~100MB RAM, 0.1 CPU core en idle; escala con volumen de requests</td></tr>
+        <tr><td>Plano de control EAB-64</td><td>Deployment K8s adicional para distribución de políticas y recolección de telemetría</td></tr>
+        <tr><td>Service account</td><td>RBAC K8s con permisos para que sidecars se registren en el plano de control</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tag-row">
+      <span class="tag teal">Zero dependencia del firewall</span>
+      <span class="tag blue">Streaming nativo</span>
+      <span class="tag purple">Policy as Code</span>
+      <span class="tag teal">Ideal para agentes propios en K8s</span>
+    </div>
+
+    <div class="desc-block">
+      <h3>Cómo funciona</h3>
+      <p>En el modelo sidecar, cada Pod de Kubernetes que contiene un agente de IA incluye un segundo contenedor con EAB-64 corriendo Envoy como proxy. El tráfico del agente hacia LLMs externos es redirigido automáticamente a través del sidecar mediante reglas de <code>iptables</code> inyectadas por un init container (el mismo patrón que usa Istio/Linkerd para service mesh). EAB-64 termina el TLS del agente, aplica las políticas EAB-64, y abre la sesión de Leg 2 hacia el LLM externo. Las políticas se definen como código (YAML/OPA) y se distribuyen a todos los sidecars vía el plano de control de EAB-64, sin intervención de equipos de red.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="flow-label">Flujo dentro del Pod — solicitud saliente</div>
+    <div class="diagram-wrap">
+      <div class="flow-row">
+        <div class="flow-node n-gray">Contenedor agente<div class="sub">localhost:8080</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">iptables redirect</span></div>
+        <div class="flow-node n-purple">Sidecar EAB-64<div class="sub">Envoy · puerto 15001</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">Leg 2 TLS</span></div>
+        <div class="flow-node n-coral">LLM externo<div class="sub">api.anthropic.com</div></div>
+      </div>
+      <div class="flow-label" style="margin-top:16px">Flujo entrante — respuesta del LLM (streaming nativo)</div>
+      <div class="flow-row">
+        <div class="flow-node n-coral">LLM externo<div class="sub">SSE / chunked</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">chunks en tiempo real</span></div>
+        <div class="flow-node n-purple">Sidecar EAB-64<div class="sub">Inspección por chunk</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">pasa al agente</span></div>
+        <div class="flow-node n-gray">Contenedor agente<div class="sub">Recibe stream</div></div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Streaming nativo sin buffering:</strong> Envoy procesa el tráfico HTTP/2 y HTTP/3 de forma incremental — cada chunk de la respuesta del LLM es inspeccionado y reenviado al agente conforme llega, sin esperar el body completo. Esto elimina completamente la limitación de latencia que afecta al Caso 4 Sub-variante B.
+    </div>
+
+    <div class="desc-block">
+      <h3>Policy as Code — configuración declarativa</h3>
+      <p>Las políticas EAB-64 se definen en YAML y se distribuyen vía el plano de control centralizado. Cada sidecar recibe su configuración de política en tiempo real sin reinicios. Ejemplo de política declarativa:</p>
+      <pre style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;overflow-x:auto;color:var(--ink-mid);line-height:1.6;">eab64_policy:
+  agent_id: "financial-advisor-agent-v2"
+  allowed_legs:
+    - destination: "api.anthropic.com"
+      methods: ["POST"]
+      paths: ["/v1/messages"]
+      max_tokens_per_request: 4096
+  pii_redaction: enabled
+  audit_log: all_requests
+  block_on_violation: true</pre>
+    </div>
+
+    <div class="desc-block">
+      <h3>Gestión centralizada de sidecars</h3>
+      <p>Un plano de control EAB-64 (deployable como Deployment de Kubernetes) distribuye políticas, recoge telemetría de todos los sidecars y centraliza los logs de auditoría. Los sidecars se registran automáticamente al iniciar usando el mecanismo de service account de Kubernetes para autenticación mutua. Cuando un agente nuevo se despliega, su sidecar solicita su política al plano de control antes de permitir cualquier tráfico saliente.</p>
+    </div>
+
+    <div class="props-grid">
+      <div class="prop-box pro">
+        <h4>✓ Ventajas</h4>
+        <ul>
+          <li>Zero dependencia del firewall de red o del equipo de infraestructura — despliegue totalmente autónomo por el equipo de IA</li>
+          <li>Streaming nativo — Envoy procesa HTTP/2 y SSE de forma incremental, sin buffering de body completo</li>
+          <li>Policy as Code real — políticas versionadas en Git, auditables, desplegables con CI/CD</li>
+          <li>Enforcement de Leg 2 garantizado — el sidecar es el único punto de salida del agente hacia LLMs externos</li>
+          <li>Aislamiento por agente — cada Pod tiene su propia instancia de política, sin riesgo de cross-contamination entre agentes</li>
+          <li>Telemetría granular — métricas por agente, por endpoint, por tipo de request, exportables a Prometheus/Grafana</li>
+        </ul>
+      </div>
+      <div class="prop-box con">
+        <h4>✗ Consideraciones</h4>
+        <ul>
+          <li>Requiere Kubernetes — no aplicable a agentes legacy o aplicaciones monolíticas fuera de K8s</li>
+          <li>Overhead de recursos por Pod: el sidecar Envoy consume ~50–100MB RAM y ~0.1 CPU core en idle</li>
+          <li>No cubre tráfico de agentes fuera del cluster K8s — shadow AI en workstations o servidores bare-metal queda sin cobertura</li>
+          <li>Requiere que el equipo de IA gestione el plano de control EAB-64 — no es fire-and-forget como los Casos 1–4</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── CASO 6 ─────────────────────────────────────────── -->
+<div class="case-block" id="caso6">
+  <div class="case-header">
+    <div class="case-number c3" style="background:#fce8e9;color:#c93940;">6</div>
+    <div class="case-header-text">
+      <h2>EAB-64 como Reverse Proxy Gateway — Agentes legacy</h2>
+      <p>EAB-64 se despliega como gateway centralizado de acceso a LLMs. Todos los agentes, aplicaciones monolíticas y scripts heredados apuntan a EAB-64 como su único endpoint de LLM. Control total de timeouts y streaming nativo.</p>
+    </div>
+  </div>
+  <div class="case-body">
+
+    <div class="desc-block"><h3>Perfil de cliente ideal</h3></div>
+    <div class="profile-grid">
+      <div class="profile-item"><div class="pi-label">Tipo de organización</div><div class="pi-value">Banca tradicional, aseguradoras, empresas con sistemas legacy</div></div>
+      <div class="profile-item"><div class="pi-label">Madurez tecnológica</div><div class="pi-value">Baja a media — aplicaciones monolíticas predominantes</div></div>
+      <div class="profile-item"><div class="pi-label">Requisito principal</div><div class="pi-value">Gobernar agentes existentes sin refactorizar código</div></div>
+      <div class="profile-item"><div class="pi-label">Problema adicional</div><div class="pi-value">API keys de LLMs dispersas en muchos sistemas</div></div>
+    </div>
+    <div class="impl-row">
+      <div class="impl-chip"><div class="ic-label">Tiempo implementación</div><div class="ic-value">1–2 semanas</div></div>
+      <div class="impl-chip"><div class="ic-label">Costo relativo</div><div class="ic-value">Medio</div></div>
+      <div class="impl-chip"><div class="ic-label">Cambios en aplicaciones</div><div class="ic-value">Solo URL base del agente</div></div>
+      <div class="impl-chip"><div class="ic-label">Requiere K8s</div><div class="ic-value">No</div></div>
+    </div>
+    <div class="desc-block"><h3>Requisitos mínimos de infraestructura</h3></div>
+    <table class="req-table">
+      <thead><tr><th>Requisito</th><th>Especificación</th></tr></thead>
+      <tbody>
+        <tr><td>Servidor gateway</td><td>Mínimo 8 cores, 16GB RAM; cluster activo-pasivo recomendado para HA (EAB-64 es punto único de falla lógico)</td></tr>
+        <tr><td>Certificado TLS público</td><td>Certificado válido para el FQDN de EAB-64 (ej. eab64.empresa.cl) — gestionado con rotación automática</td></tr>
+        <tr><td>DNS interno</td><td>Entrada DNS que resuelva el FQDN de EAB-64 hacia los agentes legacy</td></tr>
+        <tr><td>Agentes configurables</td><td>Los agentes deben soportar cambio de base URL — binarios completamente hardcodeados no son compatibles</td></tr>
+        <tr><td>Vault / secrets manager</td><td>Recomendado para centralizar API keys de LLM providers en EAB-64 (HashiCorp Vault, AWS Secrets Manager)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tag-row">
+      <span class="tag coral">Ideal para agentes legacy</span>
+      <span class="tag blue">Control total de timeouts</span>
+      <span class="tag teal">Streaming nativo</span>
+      <span class="tag purple">Sin modificar el agente</span>
+    </div>
+
+    <div class="desc-block">
+      <h3>Cómo funciona</h3>
+      <p>EAB-64 se despliega como un servidor HTTPS que expone la misma API que el LLM de destino (Anthropic, OpenAI, etc.). Los agentes y aplicaciones legacy se reconfiguran para apuntar a EAB-64 en vez del endpoint del LLM directamente — el único cambio en el agente es la URL base y, opcionalmente, las credenciales. EAB-64 recibe el request, aplica las políticas de gobernanza, abre la sesión TLS de Leg 2 hacia el LLM real, transmite la respuesta en streaming de vuelta al agente y registra la auditoría completa. Para el agente, EAB-64 es transparente — no sabe que hay un proxy en el medio.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="flow-label">Flujo completo — solicitud y respuesta en streaming</div>
+    <div class="diagram-wrap">
+      <div class="flow-row">
+        <div class="flow-node n-gray">Agente legacy<div class="sub">URL: eab64.empresa.cl</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">TLS · Leg 1</span></div>
+        <div class="flow-node n-coral">EAB-64 Gateway<div class="sub">Aplica política · audita</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">TLS · Leg 2</span></div>
+        <div class="flow-node n-coral">LLM externo<div class="sub">api.anthropic.com</div></div>
+      </div>
+      <div class="flow-label" style="margin-top:16px">Respuesta en streaming</div>
+      <div class="flow-row">
+        <div class="flow-node n-coral">LLM externo<div class="sub">SSE / chunked</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">stream Leg 2</span></div>
+        <div class="flow-node n-coral">EAB-64 Gateway<div class="sub">Inspección incremental</div></div>
+        <div class="flow-arrow" style="position:relative">→<span class="arrow-label">stream Leg 1</span></div>
+        <div class="flow-node n-gray">Agente legacy<div class="sub">Recibe stream</div></div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Compatibilidad API transparente:</strong> EAB-64 Gateway implementa la misma interfaz REST que los LLMs de destino. Un agente que antes llamaba a <code>https://api.anthropic.com/v1/messages</code> simplemente cambia el base URL a <code>https://eab64.empresa.cl/v1/messages</code>. Las credenciales del agente se reemplazan por credenciales de enrolamiento EAB-64 — el gateway las mapea internamente a las credenciales reales del LLM, centralizando la gestión de secrets.
+    </div>
+
+    <div class="desc-block">
+      <h3>Control de timeouts — ventaja sobre ICAP</h3>
+      <p>A diferencia del Caso 4 Sub-variante B donde los timeouts son configurados en el firewall (a menudo sin acceso directo por el equipo de IA), en el Caso 6 EAB-64 controla completamente todos los timeouts de ambas conexiones TLS:</p>
+      <pre style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;overflow-x:auto;color:var(--ink-mid);line-height:1.6;">timeouts:
+  client_idle: 300s          # Leg 1 — agente → gateway
+  upstream_connect: 10s      # Leg 2 — conexión inicial al LLM
+  upstream_response_first: 30s # Leg 2 — primer byte de respuesta
+  upstream_response_idle: 120s # Leg 2 — entre chunks de streaming
+  max_request_duration: 600s  # tope absoluto por request</pre>
+    </div>
+
+    <div class="desc-block">
+      <h3>Gestión centralizada de credenciales</h3>
+      <p>Los agentes legacy en muchos casos tienen las API keys del LLM hardcodeadas o en variables de entorno distribuidas — un riesgo de seguridad significativo en entornos regulados. El Caso 6 centraliza este problema: las API keys reales de los LLMs viven solo en EAB-64 Gateway, y los agentes reciben credenciales de enrolamiento EAB-64 con alcance limitado, revocables individualmente sin modificar el LLM provider. Esto cumple directamente con los requisitos de gestión de secretos de normativas como CMF o SBIF en Chile.</p>
+    </div>
+
+    <div class="props-grid">
+      <div class="prop-box pro">
+        <h4>✓ Ventajas</h4>
+        <ul>
+          <li>Compatible con cualquier agente o aplicación que soporte HTTP — no requiere Kubernetes ni cambios de infraestructura</li>
+          <li>Streaming nativo en Leg 1 y Leg 2 simultáneamente — sin buffering, sin limitaciones de timeout de terceros</li>
+          <li>Control total de timeouts — configurables por agente, por endpoint de LLM y por tipo de request</li>
+          <li>Centralización de API keys del LLM — elimina dispersión de credenciales en agentes legacy</li>
+          <li>API compatible con los proveedores de LLM — el cambio en el agente es solo la URL base</li>
+          <li>Enforcement de Leg 2 completo — EAB-64 es el único punto de contacto con el LLM externo</li>
+        </ul>
+      </div>
+      <div class="prop-box con">
+        <h4>✗ Consideraciones</h4>
+        <ul>
+          <li>EAB-64 Gateway debe tener alta disponibilidad propia — es un único punto de falla lógico si no se despliega en modo cluster</li>
+          <li>Requiere que los agentes legacy sean reconfigurables (cambio de URL base) — agentes completamente hardcodeados no pueden migrarse sin modificar el binario</li>
+          <li>No cubre agentes que no llaman a LLMs vía HTTP/HTTPS (ej. agentes que usan librerías locales sin red)</li>
+          <li>La IP o FQDN de EAB-64 Gateway se convierte en un activo crítico — su DNS y certificado TLS requieren gestión rigurosa</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── COMPARATIVA EXTENDIDA ─────────────────────────── -->
+<div class="case-block" id="comparativa">
+  <div class="case-header">
+    <div class="case-number c1" style="background:#f1f3f8;color:#3a3d4a;">≡</div>
+    <div class="case-header-text">
+      <h2>Tabla comparativa — los seis modos de despliegue</h2>
+      <p>Guía para recomendar la topología correcta según el perfil, madurez tecnológica y requisitos regulatorios del cliente.</p>
+    </div>
+  </div>
+  <div class="case-body">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Criterio</th>
+          <th>1 — Bridge L2</th>
+          <th>2 — DMZ egress</th>
+          <th>3 — Behavioral SNI</th>
+          <th>4 — ICAP</th>
+          <th>5 — Sidecar K8s</th>
+          <th>6 — Reverse Proxy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dependencia del firewall</td>
+          <td>Sí — actúa como L2 upstream</td>
+          <td>Sí — NAT hacia DMZ</td>
+          <td>Sí — egress upstream</td>
+          <td>Sí — SSL inspection + ICAP client</td>
+          <td>No</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Streaming nativo</td>
+          <td>Sí</td>
+          <td>Sí</td>
+          <td>Sí</td>
+          <td>No (Sub-B) / Sí (Sub-A)</td>
+          <td>Sí</td>
+          <td>Sí</td>
+        </tr>
+        <tr>
+          <td>Control de Leg 2 en EAB-64</td>
+          <td>Sí</td>
+          <td>Sí</td>
+          <td>Sí</td>
+          <td>Sub-A: No / Sub-B: Sí</td>
+          <td>Sí</td>
+          <td>Sí</td>
+        </tr>
+        <tr>
+          <td>Cambios en infraestructura</td>
+          <td>Cableado físico</td>
+          <td>NAT + DMZ</td>
+          <td>Proxy explícito en apps</td>
+          <td>ICAP config en FW</td>
+          <td>Sidecar en Pod</td>
+          <td>Cambio de URL en agente</td>
+        </tr>
+        <tr>
+          <td>Discovery shadow AI</td>
+          <td>Completo — ve todo L2</td>
+          <td>Parcial — NAT rules</td>
+          <td>Completo — scoring</td>
+          <td>Parcial — solo tráfico que el FW redirige</td>
+          <td>Solo tráfico del Pod</td>
+          <td>Solo tráfico del agente registrado</td>
+        </tr>
+        <tr>
+          <td>Agentes legacy (sin K8s)</td>
+          <td>Sí</td>
+          <td>Sí</td>
+          <td>Sí</td>
+          <td>Sí</td>
+          <td>No</td>
+          <td>Sí</td>
+        </tr>
+        <tr>
+          <td>Policy as Code</td>
+          <td>Parcial</td>
+          <td>Parcial</td>
+          <td>Parcial</td>
+          <td>No</td>
+          <td>Sí — nativo</td>
+          <td>Sí — centralizado</td>
+        </tr>
+        <tr>
+          <td>Punto único de falla</td>
+          <td>Sí — requiere bypass HW</td>
+          <td>No — HA lógica</td>
+          <td>No — HA lógica</td>
+          <td>No — FW continúa sin ICAP</td>
+          <td>No — por Pod</td>
+          <td>Sí — requiere cluster HA</td>
+        </tr>
+        <tr>
+          <td>Tiempo de implementación</td>
+          <td>1–2 semanas</td>
+          <td>2–3 semanas</td>
+          <td>1–3 semanas</td>
+          <td>1–2 semanas</td>
+          <td>1–3 semanas</td>
+          <td>1–2 semanas</td>
+        </tr>
+        <tr>
+          <td>Costo relativo</td>
+          <td>Bajo</td>
+          <td>Medio</td>
+          <td>Medio-Alto</td>
+          <td>Bajo</td>
+          <td>Medio</td>
+          <td>Medio</td>
+        </tr>
+        <tr>
+          <td>Cambios en aplicaciones</td>
+          <td>No</td>
+          <td>No</td>
+          <td>Sí — proxy explícito</td>
+          <td>No</td>
+          <td>No (iptables)</td>
+          <td>Sí — solo URL base</td>
+        </tr>
+        <tr>
+          <td>Ideal para</td>
+          <td>PoC / onboarding rápido</td>
+          <td>Producción regulada general</td>
+          <td>Shadow AI alto / LATAM financiero</td>
+          <td>NGFW enterprise ya en producción</td>
+          <td>Agentes propios en K8s</td>
+          <td>Agentes legacy / aplicaciones monolíticas</td>
+        </tr>
+        <tr>
+          <td>Recomendación Rosetta Labs</td>
+          <td>Primera fase</td>
+          <td>Estándar producción</td>
+          <td>Financiero maduro</td>
+          <td>Solo Sub-variante A</td>
+          <td>Workloads modernos</td>
+          <td>Migración legacy</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── GAP 1: DISCLAIMER DE RESPONSABILIDAD LEGAL ────── -->
+<div class="case-block" id="disclaimer" style="margin-bottom:48px; border-color:#f5bbbf;">
+  <div class="case-header" style="background:var(--coral-soft);">
+    <div class="case-number c1" style="background:#fff; color:var(--coral);">⚖</div>
+    <div class="case-header-text">
+      <h2 style="color:var(--coral);">Aviso de Gobernanza, Riesgo y Cumplimiento (GRC)</h2>
+      <p>Límites de responsabilidad legal · Ley 21.719 · NCG 502/524 CMF</p>
+    </div>
+  </div>
+  <div class="case-body">
+    <div class="highlight-box" style="background:var(--coral-soft); border-left-color:var(--coral); margin-bottom:20px;">
+      <strong>Disclaimer de Responsabilidad — Policy Owner:</strong><br><br>
+      EAB-64 provee la infraestructura técnica, el motor de ejecución y plantillas base de clasificación semántica orientadas al cumplimiento de la Ley 21.719 (Protección de Datos Personales) y las Normativas NCG 502 y 524 de la Comisión para el Mercado Financiero (CMF). No obstante, la definición final de las políticas de cumplimiento, posturas de bloqueo y calibración de umbrales semánticos es de responsabilidad exclusiva y excluyente del Cliente en su rol de <strong>Policy Owner</strong>, actuando EAB-64 estrictamente bajo el principio de <strong>Privacidad por Diseño (Privacy by Design)</strong>.<br><br>
+      Rosetta Labs no asume responsabilidad por filtraciones, omisiones o clasificaciones incorrectas derivadas de políticas configuradas, modificadas o desactivadas por el Cliente. La plataforma EAB-64 opera como infraestructura de enforcement técnico — no como asesor legal ni como responsable de tratamiento bajo los términos de la Ley 21.719.
+    </div>
+    <div class="desc-block">
+      <h3>Marco normativo de referencia</h3>
+    </div>
+    <table class="req-table">
+      <thead><tr><th>Norma</th><th>Alcance</th><th>Rol de EAB-64</th><th>Rol del Cliente (Policy Owner)</th></tr></thead>
+      <tbody>
+        <tr><td>Ley 21.719</td><td>Protección de datos personales en Chile</td><td>Motor técnico de redacción y bloqueo semántico de PII</td><td>Define qué datos son sensibles, umbrales de bloqueo y excepciones</td></tr>
+        <tr><td>NCG 502 CMF</td><td>Ciberseguridad en entidades financieras reguladas</td><td>Enforcement de Leg 2, auditoría de tráfico de agentes IA</td><td>Aprueba políticas de agentes, define perímetro de enrolamiento</td></tr>
+        <tr><td>NCG 524 CMF</td><td>Gestión de riesgos operacionales TI</td><td>Trazabilidad y cadena de custodia de eventos de IA</td><td>Valida que los controles satisfacen los requisitos del regulador</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── GAP 2: SHADOW MODE / ONBOARDING ──────────────── -->
+<div class="case-block" id="shadowmode" style="margin-bottom:48px;">
+  <div class="case-header">
+    <div class="case-number c1" style="background:var(--surface); color:var(--ink-soft); font-size:18px;">👁</div>
+    <div class="case-header-text">
+      <h2>Onboarding en Shadow Mode — para entornos de misión crítica</h2>
+      <p>Política de observabilidad no-intrusiva para CISOs y equipos de operaciones bancarias. Aplica a los Casos 2, 3 y 5.</p>
+    </div>
+  </div>
+  <div class="case-body">
+    <div class="highlight-box" style="margin-bottom:20px;">
+      <strong>Principio rector:</strong> ninguna integración corporativa de EAB-64 activa posturas de bloqueo desde el día uno. El sistema procesa, audita e inscribe telemetría sin interferir en el tráfico productivo hasta que el equipo de seguridad del cliente valide la calibración.
+    </div>
+
+    <div class="desc-block">
+      <h3>Fases de activación de posturas</h3>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;">
+      <div style="border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center; background:var(--card);">
+        <div style="font-size:22px; margin-bottom:8px;">🔍</div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--ink-soft); text-transform:uppercase; margin-bottom:6px;">Fase 1</div>
+        <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px;">Observe</div>
+        <div style="font-size:12px; color:var(--ink-soft);">100% del tráfico pasa. Solo logging. Sin acción. Duración: semana 1–2.</div>
+      </div>
+      <div style="border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center; background:var(--card);">
+        <div style="font-size:22px; margin-bottom:8px;">🔔</div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--ink-soft); text-transform:uppercase; margin-bottom:6px;">Fase 2</div>
+        <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px;">Alert</div>
+        <div style="font-size:12px; color:var(--ink-soft);">Tráfico pasa. Alertas al SOC por violaciones detectadas. Sin bloqueo. Duración: semana 2–4.</div>
+      </div>
+      <div style="border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center; background:var(--card);">
+        <div style="font-size:22px; margin-bottom:8px;">✏️</div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--ink-soft); text-transform:uppercase; margin-bottom:6px;">Fase 3</div>
+        <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px;">Redact</div>
+        <div style="font-size:12px; color:var(--ink-soft);">PII y datos sensibles son redactados en tránsito. Resto pasa sin bloqueo. Duración: semana 4–6.</div>
+      </div>
+      <div style="border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center; background:var(--card);">
+        <div style="font-size:22px; margin-bottom:8px;">🚫</div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--ink-soft); text-transform:uppercase; margin-bottom:6px;">Fase 4</div>
+        <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px;">Block</div>
+        <div style="font-size:12px; color:var(--ink-soft);">Postura activa completa. Solo tras validación de falsos positivos por el Policy Owner.</div>
+      </div>
+    </div>
+
+    <div class="tls-decision">
+      <h4>Política formal de Shadow Mode</h4>
+      <div class="decision-row">
+        <span class="decision-badge db-a">APLICA A</span>
+        <span>Casos 2 (DMZ Egress), 3 (Behavioral SNI) y 5 (Sidecar K8s). Estos son los modos con capacidad de bloqueo activo — los únicos donde el Shadow Mode es materialmente relevante para el CISO.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-b">DURACIÓN</span>
+        <span>Período inicial calibrable de 3 a 6 semanas en posturas Observe y Alert, configurable por el Policy Owner. No hay fecha fija de transición — la activación de Block requiere aprobación explícita del equipo de seguridad del cliente.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-b">GARANTÍA</span>
+        <span>Durante las fases Observe y Alert, EAB-64 opera con postura fail-open garantizada: si el motor de clasificación no puede tomar una decisión en el tiempo configurado, el tráfico pasa sin interrupción. Ningún agente productivo es bloqueado por latencia del sistema de gobernanza.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-c">TELEMETRÍA</span>
+        <span>Toda la telemetría de Shadow Mode (falsos positivos detectados, distribución de scores de clasificación, volumen de tráfico por categoría) es exportable en formato estructurado para el informe de validación que el Policy Owner presenta al CISO antes de activar Block.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── GAP 3: LEY 19.799 / MERKLE / HSM ─────────────── -->
+<div class="case-block" id="legal" style="margin-bottom:48px;">
+  <div class="case-header">
+    <div class="case-number c1" style="background:var(--purple-soft); color:var(--purple); font-size:18px;">🔏</div>
+    <div class="case-header-text">
+      <h2>Explicabilidad legal y No Repudio — Ley 19.799</h2>
+      <p>Arquitectura de sellado criptográfico · Firma Electrónica Avanzada · Árbol de Merkle · Módulo HSM</p>
+    </div>
+  </div>
+  <div class="case-body">
+    <div class="desc-block">
+      <h3>Cómo funciona el sellado de auditoría Tier-2</h3>
+      <p>EAB-64 consolida los bloques de auditoría diaria en un <strong>Árbol de Merkle</strong>, firmando la raíz de forma asimétrica mediante <strong>Firma Electrónica Avanzada</strong> bajo la Ley 19.799 (Sobre Documentos Electrónicos, Firma Electrónica y Servicios de Certificación), ejecutada en un módulo <strong>HSM (Hardware Security Module)</strong> certificado FIPS 140-2 Level 3. Este mecanismo invierte la carga de la prueba en litigios o fiscalizaciones: es el impugnador quien debe demostrar la adulteración, no el titular del certificado quien debe probar su integridad.</p>
+    </div>
+
+    <div class="tls-decision" style="margin-bottom:20px;">
+      <h4>Cadena de evidencia — de la decisión de política al certificado forense</h4>
+      <div class="decision-row">
+        <span class="decision-badge db-a">PASO 1</span>
+        <span><strong>Captura de evento:</strong> cada decisión de política de EAB-64 (allow, redact, block) genera un registro inmutable con timestamp UTC, identidad del agente, destino, score de clasificación y hash SHA-256 del payload inspeccionado.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-a">PASO 2</span>
+        <span><strong>Consolidación diaria en Árbol de Merkle:</strong> los registros del día se organizan como hojas del árbol. La raíz del árbol (Merkle Root) representa de forma verificable la totalidad de los eventos sin necesidad de exponer el contenido individual — propiedad crítica para cumplimiento de Ley 21.719 (minimización de datos).</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-a">PASO 3</span>
+        <span><strong>Firma HSM:</strong> la Merkle Root es firmada con la clave privada custodiada en el HSM (nunca exportable). La firma es una Firma Electrónica Avanzada bajo Ley 19.799 — equivalente legal a una firma notarial en procesos judiciales o administrativos ante la CMF, APDP o tribunales ordinarios.</span>
+      </div>
+      <div class="decision-row">
+        <span class="decision-badge db-b">PASO 4</span>
+        <span><strong>Certificado Forense:</strong> el output final es un certificado que contiene la Merkle Root firmada, el timestamp del sellado, el identificador del HSM y la ruta de verificación de cualquier registro individual. Este certificado es el instrumento que se presenta en una fiscalización o litigio.</span>
+      </div>
+    </div>
+
+    <div class="desc-block">
+      <h3>Implicancias legales concretas</h3>
+    </div>
+    <table class="req-table">
+      <thead><tr><th>Escenario</th><th>Sin EAB-64 Tier-2</th><th>Con Certificado Forense EAB-64</th></tr></thead>
+      <tbody>
+        <tr><td>Fiscalización CMF por uso de IA</td><td>El banco debe reconstruir logs dispersos de múltiples sistemas para demostrar que sus agentes no accedieron a datos no autorizados</td><td>Se presenta el Certificado Forense del período fiscalizado — la carga de la prueba recae en quien impugna</td></tr>
+        <tr><td>Litigio por filtración de datos</td><td>El banco no puede demostrar con precisión qué datos procesó el agente ni cuándo</td><td>La Merkle Root firmada permite verificar criptográficamente que un registro específico existía o no existía en una fecha determinada</td></tr>
+        <tr><td>Requerimiento APDP (Agencia de Protección de Datos Personales)</td><td>El titular debe confiar en que los registros internos del banco son completos e íntegros</td><td>Los registros de tratamiento de datos por agentes IA tienen presunción de integridad bajo Ley 19.799 por la firma HSM</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight-box" style="margin-top:16px; background:var(--purple-soft); border-left-color:var(--purple);">
+      <strong>Nota sobre la APDP:</strong> la Agencia de Protección de Datos Personales de Chile (creada por Ley 21.719, operativa desde 2026) tiene facultades sancionatorias directas sobre el responsable de tratamiento. El Certificado Forense de EAB-64 no exime de responsabilidad al Policy Owner, pero proporciona evidencia técnica de que los controles estaban activos y funcionando — argumento de diligencia debida reconocido en la práctica comparada de protección de datos (GDPR Art. 25, análogo chileno).
+    </div>
+  </div>
+</div>
+
+<!-- ─── CTA FINAL ─────────────────────────────────────── -->
+<div class="case-block" id="cta" style="margin-bottom:48px; border-color:var(--accent);">
+  <div class="case-header" style="background:var(--accent-soft);">
+    <div class="case-number c1" style="background:var(--accent); color:#fff; font-size:18px;">→</div>
+    <div class="case-header-text">
+      <h2 style="color:var(--accent);">Próximos pasos</h2>
+      <p>¿Listo para evaluar qué modo de despliegue es el correcto para tu organización?</p>
+    </div>
+  </div>
+  <div class="case-body">
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px;">
+      <div style="border:1px solid var(--border); border-radius:10px; padding:18px; background:var(--card);">
+        <div style="font-size:28px; margin-bottom:10px;">🗺️</div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--accent); text-transform:uppercase; margin-bottom:6px;">Paso 1</div>
+        <div style="font-size:14px; font-weight:600; color:var(--ink); margin-bottom:8px;">Auto-diagnóstico</div>
+        <div style="font-size:13px; color:var(--ink-soft);">Responde las 5 preguntas de la matriz de decisión al inicio de este documento para identificar tu modo de despliegue recomendado.</div>
+      </div>
+      <div style="border:1px solid var(--border); border-radius:10px; padding:18px; background:var(--card);">
+        <div style="font-size:28px; margin-bottom:10px;">🤝</div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--accent); text-transform:uppercase; margin-bottom:6px;">Paso 2</div>
+        <div style="font-size:14px; font-weight:600; color:var(--ink); margin-bottom:8px;">Reunión técnica</div>
+        <div style="font-size:13px; color:var(--ink-soft);">Agenda una sesión de 60 minutos con nuestro equipo de arquitectura. Revisamos tu infraestructura actual y confirmamos el modo óptimo.</div>
+      </div>
+      <div style="border:1px solid var(--border); border-radius:10px; padding:18px; background:var(--card);">
+        <div style="font-size:28px; margin-bottom:10px;">🧪</div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--accent); text-transform:uppercase; margin-bottom:6px;">Paso 3</div>
+        <div style="font-size:14px; font-weight:600; color:var(--ink); margin-bottom:8px;">PoC en Shadow Mode</div>
+        <div style="font-size:13px; color:var(--ink-soft);">Iniciamos con un piloto de 1–2 semanas en Shadow Mode (postura Observe). Sin riesgo para producción. Sin bloqueo de tráfico.</div>
+      </div>
+      <div style="border:1px solid var(--border); border-radius:10px; padding:18px; background:var(--card);">
+        <div style="font-size:28px; margin-bottom:10px;">🚀</div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--accent); text-transform:uppercase; margin-bottom:6px;">Paso 4</div>
+        <div style="font-size:14px; font-weight:600; color:var(--ink); margin-bottom:8px;">Producción</div>
+        <div style="font-size:13px; color:var(--ink-soft);">Despliegue completo con soporte dedicado. Activación progresiva de posturas: Observe → Alert → Redact → Block.</div>
+      </div>
+    </div>
+
+    <div style="background:var(--ink); border-radius:12px; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+      <div>
+        <p style="font-size:16px; font-weight:600; color:#fff; margin-bottom:6px;">Contacta al equipo de arquitectura EAB-64</p>
+        <p style="font-size:14px; color:#a0aec0;">Respuesta en menos de 24 horas hábiles · Reunión sin compromiso</p>
+      </div>
+      <a href="mailto:eab@globalflow.tech" style="background:var(--accent); color:#fff; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; white-space:nowrap;">eab@globalflow.tech</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  <div><strong>Rosetta Labs</strong> · EAB-64 Protocol Documentation</div>
+  <div>Confidencial · v4.0 · Julio 2026 · GRC · Shadow Mode · Ley 19.799 · CTA</div>
+</div>
+
+<script>
+function showQ(n) {
+  for(var i=1;i<=5;i++){
+    var el = document.getElementById('q'+i);
+    if(el) el.style.display = (i===n) ? 'block' : 'none';
+  }
+  document.getElementById('result-box').style.display = 'none';
+}
+function showResult(caseId, title, desc) {
+  for(var i=1;i<=5;i++){
+    var el = document.getElementById('q'+i);
+    if(el) el.style.display = 'none';
+  }
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-desc').textContent = desc;
+  var btn = document.getElementById('result-link');
+  btn.textContent = 'Ver detalle del caso';
+  btn.onclick = function(){ document.getElementById(caseId).scrollIntoView({behavior:'smooth'}); };
+  document.getElementById('result-box').style.display = 'block';
+}
+function resetQuiz() {
+  document.getElementById('result-box').style.display = 'none';
+  for(var i=2;i<=5;i++){
+    var el = document.getElementById('q'+i);
+    if(el) el.style.display = 'none';
+  }
+  document.getElementById('q1').style.display = 'block';
+}
+</script>
+</body>
+</html>
