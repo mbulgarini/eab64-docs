@@ -1,1 +1,1 @@
-# EAB-64 Documentation Hub
+# EAB-64 Documentation Hub — rebuild trigger
