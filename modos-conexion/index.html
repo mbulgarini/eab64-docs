@@ -132,7 +132,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 20px 20px 16px;
+    padding: 24px 20px 16px;
     margin-bottom: 24px;
     overflow-x: auto;
   }
@@ -165,10 +165,12 @@
   .flow-row {
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 4px;
     margin-bottom: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     min-width: 0;
+    overflow-x: auto;
+    padding: 18px 4px 6px;
   }
   .flow-node {
     border-radius: 8px;
@@ -183,11 +185,13 @@
   .flow-node .sub { font-size: 11px; font-weight: 400; opacity: 0.75; margin-top: 2px; }
   .flow-arrow {
     flex-shrink: 0;
-    width: 32px;
+    width: 48px;
+    min-width: 48px;
     text-align: center;
     font-size: 16px;
     color: var(--ink-soft);
     position: relative;
+    padding-top: 16px;
   }
   .flow-arrow.rev { transform: scaleX(-1); }
   .arrow-label {
@@ -195,10 +199,12 @@
     color: var(--ink-soft);
     white-space: nowrap;
     position: absolute;
-    top: -14px;
+    top: -16px;
     left: 50%;
     transform: translateX(-50%);
     letter-spacing: 0.04em;
+    background: var(--bg);
+    padding: 0 2px;
   }
 
   .n-gray { background: #f1f3f8; color: #3a3d4a; border: 1px solid #dde0ec; }
@@ -302,6 +308,7 @@
     padding: 10px 14px;
     text-align: left;
     border-bottom: 2px solid var(--border);
+    min-width: 90px;
   }
   .compare-table td {
     padding: 10px 14px;
@@ -311,7 +318,7 @@
   }
   .compare-table tr:last-child td { border-bottom: none; }
   .compare-table tr:hover td { background: var(--surface); }
-  .compare-table td:first-child { font-weight: 500; color: var(--ink); white-space: nowrap; }
+  .compare-table td:first-child { font-weight: 500; color: var(--ink); white-space: normal; min-width: 140px; }
 
   .footer {
     background: var(--ink);
@@ -461,12 +468,41 @@
   #lang-switcher .lang-label { font-size: 12px; letter-spacing: 0.06em; }
   [data-lang] { transition: opacity 0.15s; }
 
+
+  /* EN body banner */
+  #en-body-banner {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15,17,23,0.93);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 13px;
+    z-index: 99998;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 480px;
+    width: calc(100% - 40px);
+  }
+  #en-body-banner a { color: #a8d5a2; text-decoration: underline; }
+  #en-body-banner.visible { display: block; }
+
 </style>
 </head>
 <body>
 
 
 
+<div id="en-body-banner">
+  📄 Technical body content available in Spanish. For the full EN deck contact <a href="mailto:eab@globalflow.tech">eab@globalflow.tech</a>
+  <span onclick="document.getElementById('en-body-banner').classList.remove('visible')" 
+    style="margin-left:12px;cursor:pointer;opacity:0.6;font-size:16px;">✕</span>
+</div>
 <div id="lang-switcher" onclick="toggleLang()" title="Switch language">
   <span class="flag" id="lang-flag">🇺🇸</span>
   <span class="lang-label" id="lang-label">EN</span>
@@ -1544,7 +1580,7 @@
     </div>
   </div>
   <div class="case-body">
-    <table class="compare-table">
+    <div style="overflow-x:auto; width:100%;"><table class="compare-table" style="min-width:780px;">
       <thead>
         <tr>
           <th>Criterio</th>
@@ -2078,6 +2114,9 @@ function applyLang(lang) {
 function toggleLang() {
   currentLang = (currentLang === 'es') ? 'en' : 'es';
   applyLang(currentLang);
+  var banner = document.getElementById('en-body-banner');
+  if (currentLang === 'en') banner.classList.add('visible');
+  else banner.classList.remove('visible');
 }
 </script>
 
